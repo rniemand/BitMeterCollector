@@ -39,14 +39,13 @@ namespace BitMeterCollector.Services
     {
       foreach (var server in GetServers())
       {
+        // Get the raw data line from BitMeter
         var response = await GetStatsResponse(server);
-        
-        if (response != null)
-        {
-          var metric = _metricFactory.FromStatsResponse(response);
-          _metricService.EnqueueMetric(metric);
-        }
+        if (response == null) continue;
 
+        // Generate and send the metric
+        var metric = _metricFactory.FromStatsResponse(response);
+        _metricService.EnqueueMetric(metric);
       }
     }
 
