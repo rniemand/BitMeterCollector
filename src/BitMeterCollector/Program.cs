@@ -1,3 +1,11 @@
+using BitMeterCollector.Abstractions;
+using BitMeterCollector.Abstractions.Interfaces;
+using BitMeterCollector.Configuration;
+using BitMeterCollector.Metrics;
+using BitMeterCollector.Metrics.Interfaces;
+using BitMeterCollector.Metrics.Outputs;
+using BitMeterCollector.Services;
+using BitMeterCollector.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -28,7 +36,7 @@ namespace BitMeterCollector
             .AddSingleton<IResponseParser, ResponseParser>()
             .AddSingleton<IDateTimeAbstraction, DateTimeAbstraction>()
             .AddSingleton<IMetricFactory, MetricFactory>()
-            .AddSingleton<IBitMeterCollector, BitMeterCollector>()
+            .AddSingleton<IBitMeterCollector, Services.BitMeterCollector>()
             .AddSingleton<IMetricService, MetricService>()
             .AddSingleton<IMetricOutput, RabbitMQMetricOutput>()
             .AddSingleton<IMetricOutput, CsvMetricOutput>()
