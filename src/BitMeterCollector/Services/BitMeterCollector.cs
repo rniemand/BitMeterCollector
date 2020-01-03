@@ -1,7 +1,10 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BitMeterCollector.Configuration;
 using BitMeterCollector.Metrics.Interfaces;
+using BitMeterCollector.Models;
 using BitMeterCollector.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 
@@ -34,20 +37,47 @@ namespace BitMeterCollector.Services
 
     public async Task Tick()
     {
-      var servers = _config.Servers.Where(s => s.Enabled).ToList();
-
-      foreach (var server in servers)
+      foreach (var server in GetServers())
       {
-        var url = server.BuildUrl("getStats");
+        var response = await GetStatsResponse(server);
+        
+        if (response != null)
+        {
+          var metric = _metricFactory.FromStatsResponse(response);
+          _metricService.EnqueueMetric(metric);
+        }
+
+      }
+    }
+
+    private IEnumerable<BitMeterEndPointConfig> GetServers()
+    {
+      // TODO: [TESTS] (BitMeterCollector.GetServers) Add tests
+
+      return _config.Servers.Where(s => s.Enabled).ToList();
+    }
+
+    private async Task<StatsResponse> GetStatsResponse(BitMeterEndPointConfig endpoint)
+    {
+      // TODO: [TESTS] (BitMeterCollector.GetStatsResponse) Add tests
+      // TODO: [LOGGING] (BitMeterCollector.GetStatsResponse) Add logging
+
+      try
+      {
+        var url = endpoint.BuildUrl("getStats");
         var body = await _httpService.GetUrl(url);
 
-        if (_responseParser.TryParseStatsResponse(server, body, out var parsed))
+        if (_responseParser.TryParseStatsResponse(endpoint, body, out var parsed))
         {
-          _metricService.EnqueueMetric(_metricFactory.FromStatsResponse(parsed));
+          return parsed;
         }
       }
+      catch (Exception ex)
+      {
+        // TODO: [LOGGING] (BitMeterCollector.GetStatsResponse) Add logging
+      }
 
-
+      return null;
     }
   }
 }

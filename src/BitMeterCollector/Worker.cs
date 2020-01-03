@@ -28,7 +28,7 @@ namespace BitMeterCollector
       while (!stoppingToken.IsCancellationRequested)
       {
         await _bitMeterCollector.Tick();
-        await Task.Delay(_config.TickIntervalMs, stoppingToken);
+        await Task.Delay(_config.CollectionIntervalSec * 1000, stoppingToken);
       }
     }
   }

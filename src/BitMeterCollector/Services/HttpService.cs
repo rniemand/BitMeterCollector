@@ -1,16 +1,29 @@
+using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using BitMeterCollector.Configuration;
 using BitMeterCollector.Services.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace BitMeterCollector.Services
 {
   public class HttpService : IHttpService
   {
+    private readonly ILogger<HttpService> _logger;
+    private readonly BitMeterCollectorConfig _config;
     private readonly HttpClient _httpClient;
 
-    public HttpService()
+    public HttpService(
+      ILogger<HttpService> logger,
+      BitMeterCollectorConfig config)
     {
-      _httpClient = new HttpClient();
+      _logger = logger;
+      _config = config;
+
+      _httpClient = new HttpClient
+      {
+        Timeout = TimeSpan.FromMilliseconds(_config.HttpServiceTimeoutMs)
+      };
     }
 
     public async Task<string> GetUrl(string url)
