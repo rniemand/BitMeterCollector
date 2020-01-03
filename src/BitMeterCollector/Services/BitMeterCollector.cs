@@ -61,10 +61,12 @@ namespace BitMeterCollector.Services
     {
       // TODO: [TESTS] (BitMeterCollector.GetStatsResponse) Add tests
       // TODO: [LOGGING] (BitMeterCollector.GetStatsResponse) Add logging
+      // TODO: [COMPLETE] (BitMeterCollector.GetStatsResponse) Disable a server if it misses "x" polls
+
+      var url = endpoint.BuildUrl("getStats");
 
       try
       {
-        var url = endpoint.BuildUrl("getStats");
         var body = await _httpService.GetUrl(url);
 
         if (_responseParser.TryParseStatsResponse(endpoint, body, out var parsed))
@@ -74,7 +76,14 @@ namespace BitMeterCollector.Services
       }
       catch (Exception ex)
       {
-        // TODO: [LOGGING] (BitMeterCollector.GetStatsResponse) Add logging
+        // TODO: [COMPLETE] (BitMeterCollector.GetStatsResponse) Add HumanStackTrace()
+
+        _logger.LogError(ex,
+          "Unable to GET {url}. {exType}: {exMessage}",
+          url,
+          ex.GetType().Name,
+          ex.Message
+        );
       }
 
       return null;
