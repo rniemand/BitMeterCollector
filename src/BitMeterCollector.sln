@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29613.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BitMeterCollector", "BitMeterCollector\BitMeterCollector.csproj", "{0518C9B6-400E-433C-AD01-FB769A48CE6B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0518C9B6-400E-433C-AD01-FB769A48CE6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0518C9B6-400E-433C-AD01-FB769A48CE6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0518C9B6-400E-433C-AD01-FB769A48CE6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0518C9B6-400E-433C-AD01-FB769A48CE6B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {29B2C059-ACED-448B-AD1B-59E5C88997BB}
+	EndGlobalSection
+EndGlobal
