@@ -1,4 +1,16 @@
 # BitMeterCollector
+Holder...
+
+## Building
+Holder.
+
+Windows x64
+
+    dotnet publish -r win-x64 -c Release /p:PublishSingleFile=true
+
+Windows x86:
+
+    dotnet publish -r win-x86 -c Release /p:PublishSingleFile=true
 
 ## Windows Service Controls
 Helper commands for running BitMeterCollector as a Windows service.

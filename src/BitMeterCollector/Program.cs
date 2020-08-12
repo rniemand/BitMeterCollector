@@ -18,7 +18,9 @@ namespace BitMeterCollector
   {
     public static void Main(string[] args)
     {
-      var logger = LogManager.GetCurrentClassLogger();
+      var logger = LogManager
+        .LoadConfiguration("nlog.config")
+        .GetCurrentClassLogger();
 
       try
       {
