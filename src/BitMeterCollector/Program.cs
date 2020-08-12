@@ -18,7 +18,9 @@ namespace BitMeterCollector
 
     public static IHostBuilder CreateHostBuilder(string[] args)
     {
-      return Host.CreateDefaultBuilder(args)
+      return Host
+        .CreateDefaultBuilder(args)
+        .UseWindowsService()
         .ConfigureServices((hostContext, services) =>
         {
           // TODO: [TESTS] (Program.CreateHostBuilder) Add tests
@@ -46,6 +48,5 @@ namespace BitMeterCollector
             .AddHostedService<Worker>();
         });
     }
-      
   }
 }

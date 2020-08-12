@@ -6,6 +6,7 @@ using BitMeterCollector.Abstractions;
 using BitMeterCollector.Configuration;
 using BitMeterCollector.Metrics;
 using BitMeterCollector.Models;
+using Microsoft.Extensions.Hosting.WindowsServices;
 using Microsoft.Extensions.Logging;
 
 namespace BitMeterCollector.Services
@@ -41,6 +42,10 @@ namespace BitMeterCollector.Services
       _metricFactory = metricFactory;
       _metricService = metricService;
       _dateTime = dateTime;
+
+      // TODO: [EXPAND-ON] (BitMeterCollector.BitMeterCollector) Expand on this if / should we need tos
+      if (WindowsServiceHelpers.IsWindowsService()) 
+        _logger.LogInformation("Running as a Windows service...");
     }
 
     public async Task Tick()
