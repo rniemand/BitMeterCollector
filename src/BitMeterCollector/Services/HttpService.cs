@@ -2,11 +2,15 @@ using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using BitMeterCollector.Configuration;
-using BitMeterCollector.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace BitMeterCollector.Services
 {
+  public interface IHttpService
+  {
+    Task<string> GetUrl(string url);
+  }
+
   public class HttpService : IHttpService
   {
     private readonly ILogger<HttpService> _logger;

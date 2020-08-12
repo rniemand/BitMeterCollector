@@ -1,11 +1,8 @@
 using BitMeterCollector.Abstractions;
-using BitMeterCollector.Abstractions.Interfaces;
 using BitMeterCollector.Configuration;
 using BitMeterCollector.Metrics;
-using BitMeterCollector.Metrics.Interfaces;
 using BitMeterCollector.Metrics.Outputs;
 using BitMeterCollector.Services;
-using BitMeterCollector.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

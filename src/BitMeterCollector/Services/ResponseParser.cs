@@ -2,11 +2,16 @@ using System;
 using BitMeterCollector.Configuration;
 using BitMeterCollector.Extensions;
 using BitMeterCollector.Models;
-using BitMeterCollector.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace BitMeterCollector.Services
 {
+  public interface IResponseParser
+  {
+    // TODO: [RENAME] (IResponseParser.IResponseParser) Rename to ResponseService
+    bool TryParseStatsResponse(BitMeterEndPointConfig config, string rawResponse, out StatsResponse parsed);
+  }
+
   public class ResponseParser : IResponseParser
   {
     private readonly ILogger<ResponseParser> _logger;

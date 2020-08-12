@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace BitMeterCollector.Metrics.Interfaces
+namespace BitMeterCollector.Metrics.Outputs
 {
   public interface IMetricOutput
   {

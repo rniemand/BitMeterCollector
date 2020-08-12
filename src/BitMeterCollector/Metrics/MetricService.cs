@@ -2,11 +2,16 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Timers;
-using BitMeterCollector.Metrics.Interfaces;
+using BitMeterCollector.Metrics.Outputs;
 using Microsoft.Extensions.Logging;
 
 namespace BitMeterCollector.Metrics
 {
+  public interface IMetricService
+  {
+    void EnqueueMetric(LineProtocolPoint point);
+  }
+
   public class MetricService : IMetricService
   {
     private readonly ILogger<MetricService> _logger;

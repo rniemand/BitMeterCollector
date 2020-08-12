@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using BitMeterCollector.Metrics.Interfaces;
 
 namespace BitMeterCollector.Metrics.Outputs
 {

@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using BitMeterCollector.Configuration;
-using BitMeterCollector.Metrics.Interfaces;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 

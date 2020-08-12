@@ -3,13 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BitMeterCollector.Configuration;
-using BitMeterCollector.Metrics.Interfaces;
+using BitMeterCollector.Metrics;
 using BitMeterCollector.Models;
-using BitMeterCollector.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace BitMeterCollector.Services
 {
+  public interface IBitMeterCollector
+  {
+    Task Tick();
+  }
+
   public class BitMeterCollector : IBitMeterCollector
   {
     private readonly ILogger<BitMeterCollector> _logger;

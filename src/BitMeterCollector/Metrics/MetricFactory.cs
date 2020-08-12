@@ -1,10 +1,14 @@
-using BitMeterCollector.Abstractions.Interfaces;
-using BitMeterCollector.Metrics.Interfaces;
+using BitMeterCollector.Abstractions;
 using BitMeterCollector.Models;
 using Microsoft.Extensions.Logging;
 
 namespace BitMeterCollector.Metrics
 {
+  public interface IMetricFactory
+  {
+    LineProtocolPoint FromStatsResponse(StatsResponse response);
+  }
+
   public class MetricFactory : IMetricFactory
   {
     private readonly ILogger<MetricFactory> _logger;
