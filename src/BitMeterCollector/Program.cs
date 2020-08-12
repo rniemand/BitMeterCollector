@@ -21,10 +21,16 @@ namespace BitMeterCollector
       return Host.CreateDefaultBuilder(args)
         .ConfigureServices((hostContext, services) =>
         {
+          // TODO: [TESTS] (Program.CreateHostBuilder) Add tests
+
           // Build config
           var section = hostContext.Configuration.GetSection("BitMeter");
           var rootConfig = new BitMeterCollectorConfig();
           section.Bind(rootConfig);
+
+          // Ensure all servers have the "max missed polls" value set
+          foreach (var server in rootConfig.Servers)
+            server.SetMaxMissedPolls(rootConfig.MaxMissedPolls);
 
           // Register services
           services
