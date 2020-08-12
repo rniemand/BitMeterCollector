@@ -1,3 +1,4 @@
+using System;
 using BitMeterCollector.Abstractions;
 using BitMeterCollector.Configuration;
 using BitMeterCollector.Metrics;
@@ -6,6 +7,10 @@ using BitMeterCollector.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using NLog;
+using NLog.Extensions.Logging;
+using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace BitMeterCollector
 {
@@ -13,7 +18,22 @@ namespace BitMeterCollector
   {
     public static void Main(string[] args)
     {
-      CreateHostBuilder(args).Build().Run();
+      var logger = LogManager.GetCurrentClassLogger();
+
+      try
+      {
+        logger.Info("Starting BitMeterCollector");
+        CreateHostBuilder(args).Build().Run();
+      }
+      catch (Exception ex)
+      {
+        logger.Error(ex, "Stopping BitMeterCollector because of an exception");
+        throw;
+      }
+      finally
+      {
+        LogManager.Shutdown();
+      }
     }
 
     public static IHostBuilder CreateHostBuilder(string[] args)
@@ -45,6 +65,13 @@ namespace BitMeterCollector
             .AddSingleton<IMetricService, MetricService>()
             .AddSingleton<IMetricOutput, RabbitMQMetricOutput>()
             .AddSingleton<IMetricOutput, CsvMetricOutput>()
+            .AddLogging(loggingBuilder =>
+            {
+              // configure Logging with NLog
+              loggingBuilder.ClearProviders();
+              loggingBuilder.SetMinimumLevel(LogLevel.Trace);
+              loggingBuilder.AddNLog(hostContext.Configuration);
+            })
             .AddHostedService<Worker>();
         });
     }
