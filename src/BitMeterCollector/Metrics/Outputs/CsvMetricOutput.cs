@@ -6,7 +6,7 @@ namespace BitMeterCollector.Metrics.Outputs
   {
     public bool Enabled { get; }
 
-    public void SendMetrics(IEnumerable<LineProtocolPoint> metrics)
+    public void SendMetrics(List<LineProtocolPoint> metrics)
     {
     }
   }

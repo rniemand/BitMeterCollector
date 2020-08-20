@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using BitMeterCollector.Abstractions;
 using BitMeterCollector.Configuration;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
@@ -12,36 +14,77 @@ namespace BitMeterCollector.Metrics.Outputs
     public bool Enabled { get; }
 
     private readonly ILogger<RabbitMQMetricOutput> _logger;
+    private readonly IDateTimeAbstraction _dateTime;
     private readonly BitMeterCollectorConfig _config;
+    private ConnectionFactory _connectionFactory;
+    private DateTime? _cooldownEndTime;
     private IConnection _connection;
     private IModel _channel;
+    private int _sendFailures;
+    private readonly int _maxAllowedSendFailures;
 
+
+    // Constructor
     public RabbitMQMetricOutput(
       ILogger<RabbitMQMetricOutput> logger,
+      IDateTimeAbstraction dateTime,
       BitMeterCollectorConfig config)
     {
+      // TODO: [TESTS] (RabbitMQMetricOutput.RabbitMQMetricOutput) Add tests
+      // TODO: [CONFIG] (RabbitMQMetricOutput.RabbitMQMetricOutput) Make configurable
+
       _logger = logger;
+      _dateTime = dateTime;
       _config = config;
 
       Enabled = config.RabbitMQ.Enabled;
+      _sendFailures = 0;
+      _maxAllowedSendFailures = 5;
+
+      CreateConnectionFactory();
       Connect();
     }
 
-    public void SendMetrics(IEnumerable<LineProtocolPoint> metrics)
+
+    // Interface methods
+    public void SendMetrics(List<LineProtocolPoint> metrics)
     {
-      // TODO: [COMPLETE] (RabbitMQMetricOutput.SendMetrics) Complete me
-      // ensure we are connected
+      // TODO: [TESTS] (RabbitMQMetricOutput.SendMetrics) Add tests
+      if (!CanSendMetrics())
+        return;
 
-      var rabbitPayload = GeneratePayload(metrics);
+      if (!StillConnected())
+        Reconnect();
 
-      _channel.BasicPublish(
-        exchange: _config.RabbitMQ.Exchange,
-        routingKey: _config.RabbitMQ.RoutingKey,
-        basicProperties: null,
-        body: Encoding.UTF8.GetBytes(rabbitPayload)
-      );
+      if (!StillConnected())
+      {
+        StartReconnectCooldown();
+        return;
+      }
+
+      try
+      {
+        _logger.LogTrace("Sending {x} metrics to RabbitMQ", metrics.Count);
+
+        _channel.BasicPublish(
+          exchange: _config.RabbitMQ.Exchange,
+          routingKey: _config.RabbitMQ.RoutingKey,
+          basicProperties: null,
+          body: Encoding.UTF8.GetBytes(GeneratePayload(metrics))
+        );
+
+        HandlePublishSuccess();
+      }
+      catch (Exception ex)
+      {
+        // TODO: [STACK] (RabbitMQMetricOutput.SendMetrics) Add stack trace
+        _logger.LogError(ex, "Error sending message to RabbitMQ");
+        HandlePublishFailure();
+      }
     }
 
+
+    // Internal methods
     private static string GeneratePayload(IEnumerable<LineProtocolPoint> entries)
     {
       using (var sw = new StringWriter())
@@ -56,13 +99,53 @@ namespace BitMeterCollector.Metrics.Outputs
       }
     }
 
-    private void Connect()
+    private bool CanSendMetrics()
     {
-      if (!Enabled) return;
+      // TODO: [TESTS] (RabbitMQMetricOutput.CanSendMetrics) Add tests
 
-      // TODO: [LOGGING] (RabbitMQMetricOutput.Connect) Add logging
+      if (!Enabled)
+        return false;
 
-      var conFactory = new ConnectionFactory
+      if (!_cooldownEndTime.HasValue)
+        return true;
+
+      // ReSharper disable once InvertIf
+      if (_cooldownEndTime.Value <= _dateTime.Now)
+      {
+        _logger.LogInformation("Cooldown has ended, attempting to reconnect");
+        _cooldownEndTime = null;
+        return true;
+      }
+
+      return false;
+    }
+
+    private void HandlePublishFailure()
+    {
+      // TODO: [TESTS] (RabbitMQMetricOutput.HandlePublishFailure) Add tests
+
+      _sendFailures += 1;
+
+      if (_sendFailures <= _maxAllowedSendFailures)
+        return;
+      
+      StartReconnectCooldown();
+      _sendFailures = 0;
+    }
+
+    private void HandlePublishSuccess()
+    {
+      // TODO: [TESTS] (RabbitMQMetricOutput.HandlePublishSuccess) Add tests
+
+      _sendFailures = 0;
+    }
+
+    private void CreateConnectionFactory()
+    {
+      // TODO: [TESTS] (RabbitMQMetricOutput.CreateConnectionFactory) Add tests
+      _logger.LogTrace("Creating new connection factory");
+
+      _connectionFactory = new ConnectionFactory
       {
         UserName = _config.RabbitMQ.UserName,
         Password = _config.RabbitMQ.Password,
@@ -70,9 +153,105 @@ namespace BitMeterCollector.Metrics.Outputs
         HostName = _config.RabbitMQ.HostName,
         Port = _config.RabbitMQ.Port
       };
+    }
 
-      _connection = conFactory.CreateConnection();
-      _channel = _connection.CreateModel();
+    private void Connect()
+    {
+      // TODO: [TESTS] (RabbitMQMetricOutput.Connect) Add tests
+      // TODO: [LOGGING] (RabbitMQMetricOutput.Connect) Add logging
+
+      if (!Enabled)
+        return;
+
+      try
+      {
+        _connection = _connectionFactory.CreateConnection();
+        _channel = _connection.CreateModel();
+        _logger.LogInformation("Connected to RabbitMQ");
+      }
+      catch (Exception ex)
+      {
+        // TODO: [STACK] (RabbitMQMetricOutput.Connect) Add stack trace logging
+        _logger.LogError(ex, "Unable to create RabbitMQ connection");
+      }
+    }
+
+    private bool StillConnected()
+    {
+      // TODO: [TESTS] (RabbitMQMetricOutput.StillConnected) Add tests
+
+      if (_channel == null || _connection == null)
+        return false;
+
+      if (_channel.IsClosed || !_channel.IsOpen)
+        return false;
+
+      // ReSharper disable once ConvertIfStatementToReturnStatement
+      if (!_connection.IsOpen)
+        return false;
+
+      return true;
+    }
+
+    private void TearDownConnection()
+    {
+      // TODO: [TESTS] (RabbitMQMetricOutput.TearDownConnection) Add tests
+
+      // Check if there is anything to tear down
+      if (_channel == null && _connection == null)
+        return;
+
+      try
+      {
+        _logger.LogInformation("Tearing down RabbitMQ connection");
+
+        // Close and dispose the channel
+        if (_channel != null)
+        {
+          _logger.LogDebug("Attempting to close / dispose channel");
+          _channel?.Close();
+          _channel?.Dispose();
+        }
+
+        // Close and dispose the connection
+        if (_connection == null)
+          return;
+
+        _logger.LogDebug("Attempting to close / dispose connection");
+        _connection?.Close();
+        _connection?.Dispose();
+      }
+      catch (Exception ex)
+      {
+        // TODO: [STACK] (RabbitMQMetricOutput.TearDownConnection) Human stack trace
+        _logger.LogError(ex, "Error closing connection");
+      }
+      finally
+      {
+        _channel = null;
+        _connection = null;
+      }
+    }
+
+    private void Reconnect()
+    {
+      // TODO: [TESTS] (RabbitMQMetricOutput.Reconnect) Add tests
+
+      TearDownConnection();
+      Connect();
+    }
+
+    private void StartReconnectCooldown()
+    {
+      // TODO: [TESTS] (RabbitMQMetricOutput.StartReconnectCooldown) Add tests
+      // TODO: [CONFIG] (RabbitMQMetricOutput.StartReconnectCooldown) Make this configurable
+
+      _cooldownEndTime = _dateTime.Now.AddSeconds(5);
+
+      _logger.LogWarning(
+        "Entering cooldown period until {endTime}",
+        _cooldownEndTime.Value
+      );
     }
   }
 }

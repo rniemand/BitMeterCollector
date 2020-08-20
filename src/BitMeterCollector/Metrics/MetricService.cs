@@ -18,6 +18,7 @@ namespace BitMeterCollector.Metrics
     private readonly ConcurrentQueue<LineProtocolPoint> _metrics;
     private readonly Timer _flushTimer;
     private readonly List<IMetricOutput> _outputs;
+    private bool _logMetricFlushing;
 
     public MetricService(
       ILogger<MetricService> logger,
@@ -25,6 +26,8 @@ namespace BitMeterCollector.Metrics
     {
       _logger = logger;
 
+      // TODO: [CONFIG] (MetricService.MetricService) Make configurable
+      _logMetricFlushing = false;
       _flushTimer = new Timer(1000);
       _flushTimer.Elapsed += FlushMetrics;
       _flushTimer.Start();
@@ -43,7 +46,9 @@ namespace BitMeterCollector.Metrics
       if (_metrics.IsEmpty) return;
 
       _flushTimer.Stop();
-      _logger.LogDebug($"Flushing {_metrics.Count} queued metrics");
+      
+      if (_logMetricFlushing)
+        _logger.LogTrace("Flushing {count} queued metrics", _metrics.Count);
 
       // Dequeue metrics to send
       var metrics = new List<LineProtocolPoint>();
