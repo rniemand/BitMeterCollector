@@ -21,7 +21,6 @@ namespace BitMeterCollector.Metrics.Outputs
     private IConnection _connection;
     private IModel _channel;
     private int _sendFailures;
-    private readonly int _maxAllowedSendFailures;
 
 
     // Constructor
@@ -39,7 +38,6 @@ namespace BitMeterCollector.Metrics.Outputs
 
       Enabled = config.RabbitMQ.Enabled;
       _sendFailures = 0;
-      _maxAllowedSendFailures = 5;
 
       CreateConnectionFactory();
       Connect();
@@ -126,9 +124,9 @@ namespace BitMeterCollector.Metrics.Outputs
 
       _sendFailures += 1;
 
-      if (_sendFailures <= _maxAllowedSendFailures)
+      if (_sendFailures <= _config.RabbitMQ.MaxAllowedSendFailures)
         return;
-      
+
       StartReconnectCooldown();
       _sendFailures = 0;
     }
@@ -244,9 +242,9 @@ namespace BitMeterCollector.Metrics.Outputs
     private void StartReconnectCooldown()
     {
       // TODO: [TESTS] (RabbitMQMetricOutput.StartReconnectCooldown) Add tests
-      // TODO: [CONFIG] (RabbitMQMetricOutput.StartReconnectCooldown) Make this configurable
 
-      _cooldownEndTime = _dateTime.Now.AddSeconds(5);
+      var cooldownTimeSec = _config.RabbitMQ.BackOffTimeSeconds;
+      _cooldownEndTime = _dateTime.Now.AddSeconds(cooldownTimeSec);
 
       _logger.LogWarning(
         "Entering cooldown period until {endTime}",
