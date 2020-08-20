@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using BitMeterCollector.Abstractions;
 using BitMeterCollector.Configuration;
+using BitMeterCollector.Extensions;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 
@@ -30,7 +31,6 @@ namespace BitMeterCollector.Metrics.Outputs
       BitMeterCollectorConfig config)
     {
       // TODO: [TESTS] (RabbitMQMetricOutput.RabbitMQMetricOutput) Add tests
-      // TODO: [CONFIG] (RabbitMQMetricOutput.RabbitMQMetricOutput) Make configurable
 
       _logger = logger;
       _dateTime = dateTime;
@@ -75,8 +75,7 @@ namespace BitMeterCollector.Metrics.Outputs
       }
       catch (Exception ex)
       {
-        // TODO: [STACK] (RabbitMQMetricOutput.SendMetrics) Add stack trace
-        _logger.LogError(ex, "Error sending message to RabbitMQ");
+        _logger.LogError(ex, ex.AsGenericError());
         HandlePublishFailure();
       }
     }
@@ -156,7 +155,6 @@ namespace BitMeterCollector.Metrics.Outputs
     private void Connect()
     {
       // TODO: [TESTS] (RabbitMQMetricOutput.Connect) Add tests
-      // TODO: [LOGGING] (RabbitMQMetricOutput.Connect) Add logging
 
       if (!Enabled)
         return;
@@ -169,8 +167,7 @@ namespace BitMeterCollector.Metrics.Outputs
       }
       catch (Exception ex)
       {
-        // TODO: [STACK] (RabbitMQMetricOutput.Connect) Add stack trace logging
-        _logger.LogError(ex, "Unable to create RabbitMQ connection");
+        _logger.LogError(ex, ex.AsGenericError());
       }
     }
 
@@ -221,8 +218,7 @@ namespace BitMeterCollector.Metrics.Outputs
       }
       catch (Exception ex)
       {
-        // TODO: [STACK] (RabbitMQMetricOutput.TearDownConnection) Human stack trace
-        _logger.LogError(ex, "Error closing connection");
+        _logger.LogError(ex, ex.AsGenericError());
       }
       finally
       {

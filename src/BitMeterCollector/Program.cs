@@ -60,7 +60,7 @@ namespace BitMeterCollector
           services
             .AddSingleton(rootConfig)
             .AddSingleton<IHttpService, HttpService>()
-            .AddSingleton<IResponseParser, ResponseParser>()
+            .AddSingleton<IResponseService, ResponseService>()
             .AddSingleton<IDateTimeAbstraction, DateTimeAbstraction>()
             .AddSingleton<IMetricFactory, MetricFactory>()
             .AddSingleton<IBitMeterCollector, Services.BitMeterCollector>()

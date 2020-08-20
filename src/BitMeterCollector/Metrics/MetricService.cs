@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Timers;
+using BitMeterCollector.Configuration;
 using BitMeterCollector.Metrics.Outputs;
 using Microsoft.Extensions.Logging;
 
@@ -18,17 +19,17 @@ namespace BitMeterCollector.Metrics
     private readonly ConcurrentQueue<LineProtocolPoint> _metrics;
     private readonly Timer _flushTimer;
     private readonly List<IMetricOutput> _outputs;
-    private bool _logMetricFlushing;
+    private readonly bool _logMetricFlushing;
 
     public MetricService(
       ILogger<MetricService> logger,
-      IEnumerable<IMetricOutput> outputs)
+      IEnumerable<IMetricOutput> outputs,
+      BitMeterCollectorConfig config)
     {
       _logger = logger;
 
-      // TODO: [CONFIG] (MetricService.MetricService) Make configurable
-      _logMetricFlushing = false;
-      _flushTimer = new Timer(1000);
+      _logMetricFlushing = config.LogMetricFlushing;
+      _flushTimer = new Timer(config.MetricFlushIntervalMs);
       _flushTimer.Elapsed += FlushMetrics;
       _flushTimer.Start();
 

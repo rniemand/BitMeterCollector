@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BitMeterCollector.Abstractions;
 using BitMeterCollector.Configuration;
+using BitMeterCollector.Extensions;
 using BitMeterCollector.Metrics;
 using BitMeterCollector.Models;
 using Microsoft.Extensions.Hosting.WindowsServices;
@@ -21,7 +22,7 @@ namespace BitMeterCollector.Services
     private readonly ILogger<BitMeterCollector> _logger;
     private readonly BitMeterCollectorConfig _config;
     private readonly IHttpService _httpService;
-    private readonly IResponseParser _responseParser;
+    private readonly IResponseService _responseService;
     private readonly IMetricFactory _metricFactory;
     private readonly IMetricService _metricService;
     private readonly IDateTimeAbstraction _dateTime;
@@ -30,7 +31,7 @@ namespace BitMeterCollector.Services
       ILogger<BitMeterCollector> logger,
       BitMeterCollectorConfig config,
       IHttpService httpService,
-      IResponseParser responseParser,
+      IResponseService responseService,
       IMetricFactory metricFactory,
       IMetricService metricService,
       IDateTimeAbstraction dateTime)
@@ -38,7 +39,7 @@ namespace BitMeterCollector.Services
       _logger = logger;
       _config = config;
       _httpService = httpService;
-      _responseParser = responseParser;
+      _responseService = responseService;
       _metricFactory = metricFactory;
       _metricService = metricService;
       _dateTime = dateTime;
@@ -93,7 +94,6 @@ namespace BitMeterCollector.Services
     private async Task<StatsResponse> GetStatsResponse(BitMeterEndPointConfig endpoint)
     {
       // TODO: [TESTS] (BitMeterCollector.GetStatsResponse) Add tests
-      // TODO: [LOGGING] (BitMeterCollector.GetStatsResponse) Add logging
 
       var url = endpoint.BuildUrl("getStats");
       var mustBackOff = false;
@@ -101,7 +101,7 @@ namespace BitMeterCollector.Services
       try
       {
         var body = await _httpService.GetUrl(url);
-        if (_responseParser.TryParseStatsResponse(endpoint, body, out var parsed))
+        if (_responseService.TryParseStatsResponse(endpoint, body, out var parsed))
         {
           endpoint.SuccessfulPoll();
           return parsed;
@@ -110,22 +110,15 @@ namespace BitMeterCollector.Services
       catch (TaskCanceledException)
       {
         mustBackOff = true;
-        _logger.LogWarning(
-          "Timed out after {time} ms getting stats from {server}",
+        _logger.LogWarning("Timed out after {time} ms getting stats from {server}",
           _config.HttpServiceTimeoutMs,
           endpoint.ServerName
         );
       }
       catch (Exception ex)
       {
-        // TODO: [COMPLETE] (BitMeterCollector.GetStatsResponse) Add HumanStackTrace()
         mustBackOff = true;
-        _logger.LogError(
-          "{type} thrown getting stats from {server}: {stack}",
-          ex.GetType().Name,
-          endpoint.ServerName,
-          ex.Message
-        );
+        _logger.LogError(ex, ex.AsGenericError());
       }
       finally
       {

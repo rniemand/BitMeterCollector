@@ -6,17 +6,16 @@ using Microsoft.Extensions.Logging;
 
 namespace BitMeterCollector.Services
 {
-  public interface IResponseParser
+  public interface IResponseService
   {
-    // TODO: [RENAME] (IResponseParser.IResponseParser) Rename to ResponseService
     bool TryParseStatsResponse(BitMeterEndPointConfig config, string rawResponse, out StatsResponse parsed);
   }
 
-  public class ResponseParser : IResponseParser
+  public class ResponseService : IResponseService
   {
-    private readonly ILogger<ResponseParser> _logger;
+    private readonly ILogger<ResponseService> _logger;
 
-    public ResponseParser(ILogger<ResponseParser> logger)
+    public ResponseService(ILogger<ResponseService> logger)
     {
       _logger = logger;
     }
