@@ -1,5 +1,3 @@
-# MANUAL :: .\ci-test.ps1 -output (pwd)
-
 param (
   [Parameter(Mandatory=$false)]
   [string] $rootDir = $PSScriptRoot,
