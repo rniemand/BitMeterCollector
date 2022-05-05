@@ -6,15 +6,19 @@
 *.user
 *.userosscache
 *.sln.docstates
-.sonarqube/
-.yarn/
-rn-sonarqube.ps1
 
+# Docker files
+docker/chronograf/chronograf-v1.db
+docker/grafana/data/
+docker/influx/data/
+docker/rabbitmq/data/
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
 # Build results
+artifacts/
+tools/
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
@@ -27,11 +31,10 @@ bin/
 Bin/
 obj/
 Obj/
-tools/
-artifacts/
 
 # Visual Studio 2015 cache/options directory
 .vs/
+*\.jfm
 
 # MSTest test Results
 [Tt]est[Rr]esult*/
@@ -235,3 +238,9 @@ _Pvt_Extensions
 
 # FAKE - F# Make
 .fake/
+
+src/OnCall\.ApplicationDB/OnCall\.ApplicationDB\.jfm
+
+#(Rn.BuildScriptHelper){
+#  "version": "1.0.106"
+#}(END)
