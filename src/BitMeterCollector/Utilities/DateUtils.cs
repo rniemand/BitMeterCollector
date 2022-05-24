@@ -1,27 +1,26 @@
 using System;
 
-namespace BitMeterCollector.Utilities
+namespace BitMeterCollector.Utilities;
+
+public static class DateUtils
 {
-  public static class DateUtils
+  public static long GetUtcTime()
   {
-    public static long GetUtcTime()
+    var foo = DateTime.Now;
+    var dtOffset = ((DateTimeOffset)foo);
+    var unixTime = dtOffset.ToUnixTimeSeconds();
+    var secondsOff = dtOffset.Offset.TotalSeconds;
+
+    if (secondsOff < 0)
     {
-      var foo = DateTime.Now;
-      var dtOffset = ((DateTimeOffset)foo);
-      var unixTime = dtOffset.ToUnixTimeSeconds();
-      var secondsOff = dtOffset.Offset.TotalSeconds;
-
-      if (secondsOff < 0)
-      {
-        unixTime -= ((long)secondsOff * -1);
-      }
-
-      if (secondsOff > 0)
-      {
-        unixTime += (long)secondsOff;
-      }
-
-      return unixTime;
+      unixTime -= ((long)secondsOff * -1);
     }
+
+    if (secondsOff > 0)
+    {
+      unixTime += (long)secondsOff;
+    }
+
+    return unixTime;
   }
 }

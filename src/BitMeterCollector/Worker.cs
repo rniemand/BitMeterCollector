@@ -5,31 +5,30 @@ using BitMeterCollector.Services;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace BitMeterCollector
+namespace BitMeterCollector;
+
+public class Worker : BackgroundService
 {
-  public class Worker : BackgroundService
+  private readonly ILogger<Worker> _logger;
+  private readonly BitMeterCollectorConfig _config;
+  private readonly IBitMeterCollector _bitMeterCollector;
+
+  public Worker(
+    ILogger<Worker> logger,
+    BitMeterCollectorConfig config,
+    IBitMeterCollector bitMeterCollector)
   {
-    private readonly ILogger<Worker> _logger;
-    private readonly BitMeterCollectorConfig _config;
-    private readonly IBitMeterCollector _bitMeterCollector;
+    _logger = logger;
+    _config = config;
+    _bitMeterCollector = bitMeterCollector;
+  }
 
-    public Worker(
-      ILogger<Worker> logger,
-      BitMeterCollectorConfig config,
-      IBitMeterCollector bitMeterCollector)
+  protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+  {
+    while (!stoppingToken.IsCancellationRequested)
     {
-      _logger = logger;
-      _config = config;
-      _bitMeterCollector = bitMeterCollector;
-    }
-
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-    {
-      while (!stoppingToken.IsCancellationRequested)
-      {
-        await _bitMeterCollector.Tick();
-        await Task.Delay(_config.CollectionIntervalSec * 1000, stoppingToken);
-      }
+      await _bitMeterCollector.Tick();
+      await Task.Delay(_config.CollectionIntervalSec * 1000, stoppingToken);
     }
   }
 }
