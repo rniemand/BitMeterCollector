@@ -4,59 +4,58 @@ using BitMeterCollector.Extensions;
 using BitMeterCollector.Models;
 using Microsoft.Extensions.Logging;
 
-namespace BitMeterCollector.Services
+namespace BitMeterCollector.Services;
+
+public interface IResponseService
 {
-  public interface IResponseService
+  bool TryParseStatsResponse(BitMeterEndPointConfig config, string rawResponse, out StatsResponse parsed);
+}
+
+public class ResponseService : IResponseService
+{
+  private readonly ILogger<ResponseService> _logger;
+
+  public ResponseService(ILogger<ResponseService> logger)
   {
-    bool TryParseStatsResponse(BitMeterEndPointConfig config, string rawResponse, out StatsResponse parsed);
+    _logger = logger;
   }
 
-  public class ResponseService : IResponseService
+  public bool TryParseStatsResponse(BitMeterEndPointConfig config, string rawResponse, out StatsResponse parsed)
   {
-    private readonly ILogger<ResponseService> _logger;
+    parsed = null;
 
-    public ResponseService(ILogger<ResponseService> logger)
+    // Ensure this is not an empty string
+    if (string.IsNullOrWhiteSpace(rawResponse))
     {
-      _logger = logger;
+      _logger.LogError("Empty response provided");
+      return false;
     }
 
-    public bool TryParseStatsResponse(BitMeterEndPointConfig config, string rawResponse, out StatsResponse parsed)
+    // Ensure that we have our expected 6 entries
+    var entries = rawResponse.Split(",", StringSplitOptions.RemoveEmptyEntries);
+    if (entries.Length < 6)
     {
-      parsed = null;
-
-      // Ensure this is not an empty string
-      if (string.IsNullOrWhiteSpace(rawResponse))
-      {
-        _logger.LogError("Empty response provided");
-        return false;
-      }
-
-      // Ensure that we have our expected 6 entries
-      var entries = rawResponse.Split(",", StringSplitOptions.RemoveEmptyEntries);
-      if (entries.Length < 6)
-      {
-        _logger.LogError($"Expecting 6 entries, got {entries.Length}");
-        return false;
-      }
-
-      // Create and map the response object
-      parsed = new StatsResponse
-      {
-        DownloadToday = long.Parse(entries[0]),
-        UploadToday = long.Parse(entries[1]),
-        DownloadWeek = long.Parse(entries[2]),
-        UploadWeek = long.Parse(entries[3]),
-        DownloadMonth = long.Parse(entries[4]),
-        UploadMonth = long.Parse(entries[5]),
-        Hostname = config.ServerName.LowerTrim()
-      };
-
-      // Calculate the totals
-      parsed.TotalToday = parsed.DownloadToday + parsed.UploadToday;
-      parsed.TotalWeek = parsed.DownloadWeek + parsed.UploadWeek;
-      parsed.TotalMonth = parsed.DownloadMonth + parsed.UploadMonth;
-
-      return true;
+      _logger.LogError($"Expecting 6 entries, got {entries.Length}");
+      return false;
     }
+
+    // Create and map the response object
+    parsed = new StatsResponse
+    {
+      DownloadToday = long.Parse(entries[0]),
+      UploadToday = long.Parse(entries[1]),
+      DownloadWeek = long.Parse(entries[2]),
+      UploadWeek = long.Parse(entries[3]),
+      DownloadMonth = long.Parse(entries[4]),
+      UploadMonth = long.Parse(entries[5]),
+      Hostname = config.ServerName.LowerTrim()
+    };
+
+    // Calculate the totals
+    parsed.TotalToday = parsed.DownloadToday + parsed.UploadToday;
+    parsed.TotalWeek = parsed.DownloadWeek + parsed.UploadWeek;
+    parsed.TotalMonth = parsed.DownloadMonth + parsed.UploadMonth;
+
+    return true;
   }
 }

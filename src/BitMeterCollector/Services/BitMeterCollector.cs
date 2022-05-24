@@ -10,122 +10,115 @@ using BitMeterCollector.Models;
 using Microsoft.Extensions.Hosting.WindowsServices;
 using Microsoft.Extensions.Logging;
 
-namespace BitMeterCollector.Services
+namespace BitMeterCollector.Services;
+
+public interface IBitMeterCollector
 {
-  public interface IBitMeterCollector
+  Task Tick();
+}
+
+public class BitMeterCollector : IBitMeterCollector
+{
+  private readonly ILogger<BitMeterCollector> _logger;
+  private readonly BitMeterCollectorConfig _config;
+  private readonly IHttpService _httpService;
+  private readonly IResponseService _responseService;
+  private readonly IMetricFactory _metricFactory;
+  private readonly IMetricService _metricService;
+  private readonly IDateTimeAbstraction _dateTime;
+
+  public BitMeterCollector(
+    ILogger<BitMeterCollector> logger,
+    BitMeterCollectorConfig config,
+    IHttpService httpService,
+    IResponseService responseService,
+    IMetricFactory metricFactory,
+    IMetricService metricService,
+    IDateTimeAbstraction dateTime)
   {
-    Task Tick();
+    _logger = logger;
+    _config = config;
+    _httpService = httpService;
+    _responseService = responseService;
+    _metricFactory = metricFactory;
+    _metricService = metricService;
+    _dateTime = dateTime;
+
+    if (WindowsServiceHelpers.IsWindowsService()) 
+      _logger.LogInformation("Running as a Windows service...");
   }
 
-  public class BitMeterCollector : IBitMeterCollector
+  public async Task Tick()
   {
-    private readonly ILogger<BitMeterCollector> _logger;
-    private readonly BitMeterCollectorConfig _config;
-    private readonly IHttpService _httpService;
-    private readonly IResponseService _responseService;
-    private readonly IMetricFactory _metricFactory;
-    private readonly IMetricService _metricService;
-    private readonly IDateTimeAbstraction _dateTime;
-
-    public BitMeterCollector(
-      ILogger<BitMeterCollector> logger,
-      BitMeterCollectorConfig config,
-      IHttpService httpService,
-      IResponseService responseService,
-      IMetricFactory metricFactory,
-      IMetricService metricService,
-      IDateTimeAbstraction dateTime)
+    foreach (var server in GetServers())
     {
-      _logger = logger;
-      _config = config;
-      _httpService = httpService;
-      _responseService = responseService;
-      _metricFactory = metricFactory;
-      _metricService = metricService;
-      _dateTime = dateTime;
+      // Get the raw data line from BitMeter
+      var response = await GetStatsResponse(server);
+      if (response == null) continue;
 
-      // TODO: [EXPAND-ON] (BitMeterCollector.BitMeterCollector) Expand on this if / should we need tos
-      if (WindowsServiceHelpers.IsWindowsService()) 
-        _logger.LogInformation("Running as a Windows service...");
+      // Generate and send the metric
+      var metric = _metricFactory.FromStatsResponse(response);
+      _metricService.EnqueueMetric(metric);
     }
+  }
 
-    public async Task Tick()
+  private IEnumerable<BitMeterEndPointConfig> GetServers()
+  {
+    var currentTime = _dateTime.Now;
+
+    return _config.Servers
+      .Where(s => s.CanCollectStats(currentTime))
+      .ToList();
+  }
+
+  private void HandleServerBackOff(BitMeterEndPointConfig endpoint)
+  {
+    if (!endpoint.UnsuccessfulPoll())
+      return;
+
+    var backOffEndTime = _dateTime.Now.AddSeconds(_config.BackOffPeriodSeconds);
+    endpoint.SetBackOffEndTime(backOffEndTime);
+
+    _logger.LogInformation(
+      "Unable to reach {server} - backing off for {time} seconds (will try again at {date})",
+      endpoint.ServerName,
+      _config.BackOffPeriodSeconds,
+      backOffEndTime
+    );
+  }
+
+  private async Task<StatsResponse> GetStatsResponse(BitMeterEndPointConfig endpoint)
+  {
+    var url = endpoint.BuildUrl("getStats");
+    var mustBackOff = false;
+
+    try
     {
-      foreach (var server in GetServers())
+      var body = await _httpService.GetUrl(url);
+      if (_responseService.TryParseStatsResponse(endpoint, body, out var parsed))
       {
-        // Get the raw data line from BitMeter
-        var response = await GetStatsResponse(server);
-        if (response == null) continue;
-
-        // Generate and send the metric
-        var metric = _metricFactory.FromStatsResponse(response);
-        _metricService.EnqueueMetric(metric);
+        endpoint.SuccessfulPoll();
+        return parsed;
       }
     }
-
-    private IEnumerable<BitMeterEndPointConfig> GetServers()
+    catch (TaskCanceledException)
     {
-      // TODO: [TESTS] (BitMeterCollector.GetServers) Add tests
-      var currentTime = _dateTime.Now;
-
-      return _config.Servers
-        .Where(s => s.CanCollectStats(currentTime))
-        .ToList();
-    }
-
-    private void HandleServerBackOff(BitMeterEndPointConfig endpoint)
-    {
-      // TODO: [TESTS] (BitMeterCollector.HandleServerBackOff) Add tests
-
-      if (!endpoint.UnsuccessfulPoll())
-        return;
-
-      var backOffEndTime = _dateTime.Now.AddSeconds(_config.BackOffPeriodSeconds);
-      endpoint.SetBackOffEndTime(backOffEndTime);
-
-      _logger.LogInformation(
-        "Unable to reach {server} - backing off for {time} seconds (will try again at {date})",
-        endpoint.ServerName,
-        _config.BackOffPeriodSeconds,
-        backOffEndTime
+      mustBackOff = true;
+      _logger.LogWarning("Timed out after {time} ms getting stats from {server}",
+        _config.HttpServiceTimeoutMs,
+        endpoint.ServerName
       );
     }
-
-    private async Task<StatsResponse> GetStatsResponse(BitMeterEndPointConfig endpoint)
+    catch (Exception ex)
     {
-      // TODO: [TESTS] (BitMeterCollector.GetStatsResponse) Add tests
-
-      var url = endpoint.BuildUrl("getStats");
-      var mustBackOff = false;
-
-      try
-      {
-        var body = await _httpService.GetUrl(url);
-        if (_responseService.TryParseStatsResponse(endpoint, body, out var parsed))
-        {
-          endpoint.SuccessfulPoll();
-          return parsed;
-        }
-      }
-      catch (TaskCanceledException)
-      {
-        mustBackOff = true;
-        _logger.LogWarning("Timed out after {time} ms getting stats from {server}",
-          _config.HttpServiceTimeoutMs,
-          endpoint.ServerName
-        );
-      }
-      catch (Exception ex)
-      {
-        mustBackOff = true;
-        _logger.LogError(ex, ex.AsGenericError());
-      }
-      finally
-      {
-        if (mustBackOff) HandleServerBackOff(endpoint);
-      }
-
-      return null;
+      mustBackOff = true;
+      _logger.LogError(ex, ex.AsGenericError());
     }
+    finally
+    {
+      if (mustBackOff) HandleServerBackOff(endpoint);
+    }
+
+    return null;
   }
 }
