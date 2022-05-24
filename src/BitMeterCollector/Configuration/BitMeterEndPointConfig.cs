@@ -29,39 +29,28 @@ public class BitMeterEndPointConfig
 
   public bool UnsuccessfulPoll()
   {
-    // TODO: [TESTS] (BitMeterEndPointConfig.UnsuccessfulPoll) Add tests
-
     MissedPolls += 1;
-
     return MissedPolls >= MaxMissedPolls;
   }
 
   public void SuccessfulPoll()
   {
-    // TODO: [TESTS] (BitMeterEndPointConfig.SuccessfulPoll) Add tests
-
     MissedPolls = 0;
     BackOffEndTime = null;
   }
 
   public void SetMaxMissedPolls(int amount)
   {
-    // TODO: [TESTS] (BitMeterEndPointConfig.SetMaxMissedPolls) Add tests
-
     MaxMissedPolls = amount;
   }
 
   public void SetBackOffEndTime(DateTime endTime)
   {
-    // TODO: [TESTS] (BitMeterEndPointConfig.SetBackOffEndTime) Add tests
-
     BackOffEndTime = endTime;
   }
 
   public bool CanCollectStats(DateTime now)
   {
-    // TODO: [TESTS] (BitMeterEndPointConfig.CanCollectStats) Add tests
-
     // Not enabled
     if (Enabled == false)
       return false;
