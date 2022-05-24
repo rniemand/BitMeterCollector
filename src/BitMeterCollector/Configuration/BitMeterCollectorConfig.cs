@@ -1,28 +1,15 @@
-namespace BitMeterCollector.Configuration
+using System;
+
+namespace BitMeterCollector.Configuration;
+
+public class BitMeterCollectorConfig
 {
-  public class BitMeterCollectorConfig
-  {
-    public RabbitMQConfig RabbitMQ { get; set; }
-    public BitMeterEndPointConfig[] Servers { get; set; }
-    public int CollectionIntervalSec { get; set; }
-    public int HttpServiceTimeoutMs { get; set; }
-    public int MaxMissedPolls { get; set; }
-    public int BackOffPeriodSeconds { get; set; }
-    public bool LogMetricFlushing { get; set; }
-    public int MetricFlushIntervalMs { get; set; }
-
-    public BitMeterCollectorConfig()
-    {
-      // TODO: [TESTS] (BitMeterCollectorConfig.BitMeterCollectorConfig) Add tests
-
-      RabbitMQ = new RabbitMQConfig();
-      Servers = new BitMeterEndPointConfig[0];
-      CollectionIntervalSec = 10;
-      HttpServiceTimeoutMs = 750;
-      MaxMissedPolls = 5;
-      BackOffPeriodSeconds = 60 * 10;
-      LogMetricFlushing = false;
-      MetricFlushIntervalMs = 1000;
-    }
-  }
+  public RabbitMQConfig RabbitMQ { get; set; } = new();
+  public BitMeterEndPointConfig[] Servers { get; set; } = Array.Empty<BitMeterEndPointConfig>();
+  public int CollectionIntervalSec { get; set; } = 10;
+  public int HttpServiceTimeoutMs { get; set; } = 750;
+  public int MaxMissedPolls { get; set; } = 5;
+  public int BackOffPeriodSeconds { get; set; } = 60 * 10;
+  public bool LogMetricFlushing { get; set; }
+  public int MetricFlushIntervalMs { get; set; } = 1000;
 }
