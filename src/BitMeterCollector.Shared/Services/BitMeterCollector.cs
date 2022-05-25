@@ -1,10 +1,11 @@
-using BitMeterCollector.Shared.Abstractions;
 using BitMeterCollector.Shared.Configuration;
 using BitMeterCollector.Shared.Extensions;
-using BitMeterCollector.Shared.Metrics;
+using BitMeterCollector.Shared.Factories;
 using BitMeterCollector.Shared.Models;
 using Microsoft.Extensions.Hosting.WindowsServices;
 using Microsoft.Extensions.Logging;
+using Rn.NetCore.Common.Abstractions;
+using Rn.NetCore.Metrics;
 
 namespace BitMeterCollector.Shared.Services;
 
@@ -55,7 +56,7 @@ public class BitMeterCollector : IBitMeterCollector
 
       // Generate and send the metric
       var metric = _metricFactory.FromStatsResponse(response);
-      _metricService.EnqueueMetric(metric);
+      await _metricService.SubmitMetricAsync(metric);
     }
 
     await Task.Delay(_config.CollectionIntervalSec * 1000, stoppingToken);

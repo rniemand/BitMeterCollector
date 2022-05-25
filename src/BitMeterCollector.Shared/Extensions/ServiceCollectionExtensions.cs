@@ -1,8 +1,12 @@
-using BitMeterCollector.Shared.Abstractions;
-using BitMeterCollector.Shared.Metrics;
-using BitMeterCollector.Shared.Metrics.Outputs;
+using BitMeterCollector.Shared.Factories;
 using BitMeterCollector.Shared.Services;
 using Microsoft.Extensions.DependencyInjection;
+using Rn.NetCore.Common.Abstractions;
+using Rn.NetCore.Common.Logging;
+using Rn.NetCore.Metrics;
+using Rn.NetCore.Metrics.Outputs;
+using Rn.NetCore.Metrics.Rabbit;
+using Rn.NetCore.Metrics.Rabbit.Interfaces;
 
 namespace BitMeterCollector.Shared.Extensions;
 
@@ -13,11 +17,16 @@ public static class ServiceCollectionExtensions
     return services
       .AddSingleton<IHttpService, HttpService>()
       .AddSingleton<IResponseService, ResponseService>()
-      .AddSingleton<IDateTimeAbstraction, DateTimeAbstraction>()
       .AddSingleton<IMetricFactory, MetricFactory>()
       .AddSingleton<IBitMeterCollector, Services.BitMeterCollector>()
+
+      .AddSingleton<IDateTimeAbstraction, DateTimeAbstraction>()
+      .AddSingleton(typeof(ILoggerAdapter<>), typeof(LoggerAdapter<>))
+
+      .AddSingleton<IMetricServiceUtils, MetricServiceUtils>()
       .AddSingleton<IMetricService, MetricService>()
-      .AddSingleton<IMetricOutput, RabbitMQMetricOutput>()
-      .AddSingleton<IMetricOutput, CsvMetricOutput>();
+      .AddSingleton<IRabbitFactory, RabbitFactory>()
+      .AddSingleton<IRabbitConnection, RabbitConnection>()
+      .AddSingleton<IMetricOutput, RabbitMetricOutput>();
   }
 }
