@@ -1,7 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
-using BitMeterCollector.Configuration;
-using BitMeterCollector.Services;
+using BitMeterCollector.Shared.Configuration;
+using BitMeterCollector.Shared.Services;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 

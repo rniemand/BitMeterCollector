@@ -1,9 +1,9 @@
 using System;
-using BitMeterCollector.Abstractions;
-using BitMeterCollector.Configuration;
-using BitMeterCollector.Metrics;
-using BitMeterCollector.Metrics.Outputs;
-using BitMeterCollector.Services;
+using BitMeterCollector.Shared.Abstractions;
+using BitMeterCollector.Shared.Configuration;
+using BitMeterCollector.Shared.Metrics;
+using BitMeterCollector.Shared.Metrics.Outputs;
+using BitMeterCollector.Shared.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -61,7 +61,7 @@ public class Program
           .AddSingleton<IResponseService, ResponseService>()
           .AddSingleton<IDateTimeAbstraction, DateTimeAbstraction>()
           .AddSingleton<IMetricFactory, MetricFactory>()
-          .AddSingleton<IBitMeterCollector, Services.BitMeterCollector>()
+          .AddSingleton<IBitMeterCollector, Shared.Services.BitMeterCollector>()
           .AddSingleton<IMetricService, MetricService>()
           .AddSingleton<IMetricOutput, RabbitMQMetricOutput>()
           .AddSingleton<IMetricOutput, CsvMetricOutput>()
