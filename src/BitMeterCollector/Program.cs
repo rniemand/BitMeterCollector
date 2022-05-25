@@ -1,11 +1,5 @@
 using System;
-using BitMeterCollector.Shared.Abstractions;
-using BitMeterCollector.Shared.Configuration;
 using BitMeterCollector.Shared.Extensions;
-using BitMeterCollector.Shared.Metrics;
-using BitMeterCollector.Shared.Metrics.Outputs;
-using BitMeterCollector.Shared.Services;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -58,7 +52,6 @@ public class Program
           .AddBitMeterCollector()
           .AddLogging(loggingBuilder =>
           {
-            // configure Logging with NLog
             loggingBuilder.ClearProviders();
             loggingBuilder.SetMinimumLevel(LogLevel.Trace);
             loggingBuilder.AddNLog(hostContext.Configuration);

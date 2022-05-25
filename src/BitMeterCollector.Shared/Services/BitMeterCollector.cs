@@ -10,7 +10,7 @@ namespace BitMeterCollector.Shared.Services;
 
 public interface IBitMeterCollector
 {
-  Task Tick();
+  Task TickAsync(CancellationToken stoppingToken);
 }
 
 public class BitMeterCollector : IBitMeterCollector
@@ -44,18 +44,21 @@ public class BitMeterCollector : IBitMeterCollector
       _logger.LogInformation("Running as a Windows service...");
   }
 
-  public async Task Tick()
+  public async Task TickAsync(CancellationToken stoppingToken)
   {
     foreach (var server in GetServers())
     {
       // Get the raw data line from BitMeter
       var response = await GetStatsResponse(server);
-      if (response == null) continue;
+      if (response == null)
+        continue;
 
       // Generate and send the metric
       var metric = _metricFactory.FromStatsResponse(response);
       _metricService.EnqueueMetric(metric);
     }
+
+    await Task.Delay(_config.CollectionIntervalSec * 1000, stoppingToken);
   }
 
   private IEnumerable<BitMeterEndPointConfig> GetServers()
