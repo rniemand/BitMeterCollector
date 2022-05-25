@@ -13,7 +13,7 @@ public class RabbitMQMetricOutput : IMetricOutput
 
   private readonly ILogger<RabbitMQMetricOutput> _logger;
   private readonly IDateTimeAbstraction _dateTime;
-  private readonly BitMeterCollectorConfig _config;
+  private readonly BitMeterConfig _config;
   private ConnectionFactory _connectionFactory;
   private DateTime? _cooldownEndTime;
   private IConnection _connection;
@@ -25,7 +25,7 @@ public class RabbitMQMetricOutput : IMetricOutput
   public RabbitMQMetricOutput(
     ILogger<RabbitMQMetricOutput> logger,
     IDateTimeAbstraction dateTime,
-    BitMeterCollectorConfig config)
+    BitMeterConfig config)
   {
     _logger = logger;
     _dateTime = dateTime;

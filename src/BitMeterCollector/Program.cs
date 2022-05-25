@@ -1,6 +1,7 @@
 using System;
 using BitMeterCollector.Shared.Abstractions;
 using BitMeterCollector.Shared.Configuration;
+using BitMeterCollector.Shared.Extensions;
 using BitMeterCollector.Shared.Metrics;
 using BitMeterCollector.Shared.Metrics.Outputs;
 using BitMeterCollector.Shared.Services;
@@ -45,26 +46,16 @@ public class Program
       .UseWindowsService()
       .ConfigureServices((hostContext, services) =>
       {
-        // Build config
-        var section = hostContext.Configuration.GetSection("BitMeter");
-        var rootConfig = new BitMeterCollectorConfig();
-        section.Bind(rootConfig);
+        var bitmeterConfig = hostContext.Configuration.BindBitMeterConfig();
 
         // Ensure all servers have the "max missed polls" value set
-        foreach (var server in rootConfig.Servers)
-          server.SetMaxMissedPolls(rootConfig.MaxMissedPolls);
+        foreach (var server in bitmeterConfig.Servers)
+          server.SetMaxMissedPolls(bitmeterConfig.MaxMissedPolls);
 
         // Register services
         services
-          .AddSingleton(rootConfig)
-          .AddSingleton<IHttpService, HttpService>()
-          .AddSingleton<IResponseService, ResponseService>()
-          .AddSingleton<IDateTimeAbstraction, DateTimeAbstraction>()
-          .AddSingleton<IMetricFactory, MetricFactory>()
-          .AddSingleton<IBitMeterCollector, Shared.Services.BitMeterCollector>()
-          .AddSingleton<IMetricService, MetricService>()
-          .AddSingleton<IMetricOutput, RabbitMQMetricOutput>()
-          .AddSingleton<IMetricOutput, CsvMetricOutput>()
+          .AddSingleton(bitmeterConfig)
+          .AddBitMeterCollector()
           .AddLogging(loggingBuilder =>
           {
             // configure Logging with NLog

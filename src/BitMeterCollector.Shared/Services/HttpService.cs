@@ -11,12 +11,12 @@ public interface IHttpService
 public class HttpService : IHttpService
 {
   private readonly ILogger<HttpService> _logger;
-  private readonly BitMeterCollectorConfig _config;
+  private readonly BitMeterConfig _config;
   private readonly HttpClient _httpClient;
 
   public HttpService(
     ILogger<HttpService> logger,
-    BitMeterCollectorConfig config)
+    BitMeterConfig config)
   {
     _logger = logger;
     _config = config;

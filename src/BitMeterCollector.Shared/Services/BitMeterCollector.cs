@@ -16,7 +16,7 @@ public interface IBitMeterCollector
 public class BitMeterCollector : IBitMeterCollector
 {
   private readonly ILogger<BitMeterCollector> _logger;
-  private readonly BitMeterCollectorConfig _config;
+  private readonly BitMeterConfig _config;
   private readonly IHttpService _httpService;
   private readonly IResponseService _responseService;
   private readonly IMetricFactory _metricFactory;
@@ -25,7 +25,7 @@ public class BitMeterCollector : IBitMeterCollector
 
   public BitMeterCollector(
     ILogger<BitMeterCollector> logger,
-    BitMeterCollectorConfig config,
+    BitMeterConfig config,
     IHttpService httpService,
     IResponseService responseService,
     IMetricFactory metricFactory,

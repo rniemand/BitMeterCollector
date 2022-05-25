@@ -1,6 +1,6 @@
 namespace BitMeterCollector.Shared.Configuration;
 
-public class BitMeterCollectorConfig
+public class BitMeterConfig
 {
   public RabbitMQConfig RabbitMQ { get; set; } = new();
   public BitMeterEndPointConfig[] Servers { get; set; } = Array.Empty<BitMeterEndPointConfig>();

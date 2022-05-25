@@ -23,7 +23,7 @@ public class MetricService : IMetricService
   public MetricService(
     ILogger<MetricService> logger,
     IEnumerable<IMetricOutput> outputs,
-    BitMeterCollectorConfig config)
+    BitMeterConfig config)
   {
     _logger = logger;
 

@@ -10,12 +10,12 @@ namespace BitMeterCollector;
 public class Worker : BackgroundService
 {
   private readonly ILogger<Worker> _logger;
-  private readonly BitMeterCollectorConfig _config;
+  private readonly BitMeterConfig _config;
   private readonly IBitMeterCollector _bitMeterCollector;
 
   public Worker(
     ILogger<Worker> logger,
-    BitMeterCollectorConfig config,
+    BitMeterConfig config,
     IBitMeterCollector bitMeterCollector)
   {
     _logger = logger;
