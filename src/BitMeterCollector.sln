@@ -5,14 +5,13 @@ VisualStudioVersion = 17.2.32422.2
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BitMeterCollector", "BitMeterCollector\BitMeterCollector.csproj", "{0518C9B6-400E-433C-AD01-FB769A48CE6B}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Misc.", "Misc.", "{3905A67D-B167-45F0-8252-CA32DDF2B9D5}"
-	ProjectSection(SolutionItems) = preProject
-		..\README.md = ..\README.md
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{0DFF93A1-953C-473D-A3FE-C3500755D4BC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BitMeterCollector.T1.Tests", "..\test\BitMeterCollector.T1.Tests\BitMeterCollector.T1.Tests.csproj", "{FAA41EE2-A5A0-4634-BC81-41EDF7FB504A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BitMeterCollector.T1.Tests", "..\test\BitMeterCollector.T1.Tests\BitMeterCollector.T1.Tests.csproj", "{FAA41EE2-A5A0-4634-BC81-41EDF7FB504A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BitMeterCollector.Shared", "BitMeterCollector.Shared\BitMeterCollector.Shared.csproj", "{4FA60718-7122-4D47-8D4D-289804801451}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Lib", "Lib", "{F3081361-30C5-4A60-977A-BFCCE11DE2DF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -28,12 +27,17 @@ Global
 		{FAA41EE2-A5A0-4634-BC81-41EDF7FB504A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FAA41EE2-A5A0-4634-BC81-41EDF7FB504A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FAA41EE2-A5A0-4634-BC81-41EDF7FB504A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4FA60718-7122-4D47-8D4D-289804801451}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4FA60718-7122-4D47-8D4D-289804801451}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4FA60718-7122-4D47-8D4D-289804801451}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4FA60718-7122-4D47-8D4D-289804801451}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{FAA41EE2-A5A0-4634-BC81-41EDF7FB504A} = {0DFF93A1-953C-473D-A3FE-C3500755D4BC}
+		{4FA60718-7122-4D47-8D4D-289804801451} = {F3081361-30C5-4A60-977A-BFCCE11DE2DF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {29B2C059-ACED-448B-AD1B-59E5C88997BB}

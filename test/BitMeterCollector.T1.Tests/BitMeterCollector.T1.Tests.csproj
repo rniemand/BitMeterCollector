@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
-
+    <ProjectGuid>1BF08BFD-CBBF-4828-97C8-7A47BF49AA8C</ProjectGuid>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
