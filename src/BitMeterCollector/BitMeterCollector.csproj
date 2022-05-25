@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <UserSecretsId>dotnet-BitMeterCollector-E4C0A4C5-F7A9-43AE-A2B6-83117CC2FC93</UserSecretsId>
+    <ProjectGuid>0B5AC691-674C-403F-B63A-A217E08A28C5</ProjectGuid>
   </PropertyGroup>
 
   <ItemGroup>
