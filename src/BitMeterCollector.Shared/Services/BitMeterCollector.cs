@@ -2,7 +2,6 @@ using BitMeterCollector.Shared.Configuration;
 using BitMeterCollector.Shared.Extensions;
 using BitMeterCollector.Shared.Factories;
 using BitMeterCollector.Shared.Models;
-using Microsoft.Extensions.Hosting.WindowsServices;
 using Microsoft.Extensions.Logging;
 using Rn.NetCore.Common.Abstractions;
 using Rn.NetCore.Metrics;
@@ -40,9 +39,6 @@ public class BitMeterCollector : IBitMeterCollector
     _metricFactory = metricFactory;
     _metricService = metricService;
     _dateTime = dateTime;
-
-    if (WindowsServiceHelpers.IsWindowsService()) 
-      _logger.LogInformation("Running as a Windows service...");
   }
 
   public async Task TickAsync(CancellationToken stoppingToken)
