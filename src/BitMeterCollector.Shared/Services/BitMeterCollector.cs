@@ -1,10 +1,10 @@
 using BitMeterCollector.Shared.Configuration;
 using BitMeterCollector.Shared.Extensions;
-using BitMeterCollector.Shared.Factories;
 using BitMeterCollector.Shared.Models;
 using Microsoft.Extensions.Logging;
 using Rn.NetCore.Common.Abstractions;
 using Rn.NetCore.Metrics;
+using Rn.NetCore.Metrics.Models;
 
 namespace BitMeterCollector.Shared.Services;
 
@@ -19,7 +19,6 @@ public class BitMeterCollector : IBitMeterCollector
   private readonly BitMeterConfig _config;
   private readonly IHttpService _httpService;
   private readonly IResponseService _responseService;
-  private readonly IMetricFactory _metricFactory;
   private readonly IMetricService _metricService;
   private readonly IDateTimeAbstraction _dateTime;
 
@@ -28,7 +27,6 @@ public class BitMeterCollector : IBitMeterCollector
     BitMeterConfig config,
     IHttpService httpService,
     IResponseService responseService,
-    IMetricFactory metricFactory,
     IMetricService metricService,
     IDateTimeAbstraction dateTime)
   {
@@ -36,7 +34,6 @@ public class BitMeterCollector : IBitMeterCollector
     _config = config;
     _httpService = httpService;
     _responseService = responseService;
-    _metricFactory = metricFactory;
     _metricService = metricService;
     _dateTime = dateTime;
   }
@@ -51,8 +48,7 @@ public class BitMeterCollector : IBitMeterCollector
         continue;
 
       // Generate and send the metric
-      var metric = _metricFactory.FromStatsResponse(response);
-      await _metricService.SubmitMetricAsync(metric);
+      await _metricService.SubmitMetricAsync(CreateMetric(response));
     }
 
     await Task.Delay(_config.CollectionIntervalSec * 1000, stoppingToken);
@@ -116,5 +112,23 @@ public class BitMeterCollector : IBitMeterCollector
     }
 
     return null;
+  }
+
+  private CoreMetric CreateMetric(StatsResponse response)
+  {
+    var metric = new CoreMetric("bitmeter.stats")
+      .SetTag("host", response.Hostname);
+
+    metric.Fields["download_today"] = response.DownloadToday;
+    metric.Fields["download_week"] = response.DownloadWeek;
+    metric.Fields["download_month"] = response.DownloadMonth;
+    metric.Fields["upload_today"] = response.UploadToday;
+    metric.Fields["upload_week"] = response.UploadWeek;
+    metric.Fields["upload_month"] = response.UploadMonth;
+    metric.Fields["total_today"] = response.TotalToday;
+    metric.Fields["total_week"] = response.TotalWeek;
+    metric.Fields["total_month"] = response.TotalMonth;
+
+    return metric;
   }
 }
