@@ -21,7 +21,7 @@ public class ResponseService : IResponseService
 
   public bool TryParseStatsResponse(BitMeterEndPointConfig config, string rawResponse, out StatsResponse parsed)
   {
-    parsed = null;
+    parsed = new StatsResponse();
 
     // Ensure this is not an empty string
     if (string.IsNullOrWhiteSpace(rawResponse))
@@ -47,7 +47,7 @@ public class ResponseService : IResponseService
       UploadWeek = long.Parse(entries[3]),
       DownloadMonth = long.Parse(entries[4]),
       UploadMonth = long.Parse(entries[5]),
-      Hostname = config.ServerName.LowerTrim()
+      HostName = config.ServerName.LowerTrim()
     };
 
     // Calculate the totals

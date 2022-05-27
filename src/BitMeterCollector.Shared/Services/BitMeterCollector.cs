@@ -79,7 +79,7 @@ public class BitMeterCollector : IBitMeterCollector
     );
   }
 
-  private async Task<StatsResponse> GetStatsResponse(BitMeterEndPointConfig endpoint)
+  private async Task<StatsResponse?> GetStatsResponse(BitMeterEndPointConfig endpoint)
   {
     var url = endpoint.BuildUrl("getStats");
     var mustBackOff = false;
@@ -114,10 +114,10 @@ public class BitMeterCollector : IBitMeterCollector
     return null;
   }
 
-  private CoreMetric CreateMetric(StatsResponse response)
+  private static CoreMetric CreateMetric(StatsResponse response)
   {
     var metric = new CoreMetric("bitmeter.stats")
-      .SetTag("host", response.Hostname);
+      .SetTag("host", response.HostName);
 
     metric.Fields["download_today"] = response.DownloadToday;
     metric.Fields["download_week"] = response.DownloadWeek;
