@@ -11,13 +11,6 @@ public static class ExceptionExtensions
     return sb.ToString();
   }
 
-  public static string AsGenericError(this Exception ex)
-  {
-    var exType = ex.GetType().Name;
-    return $"An unexpected {exType} was thrown: {ex.Message}. | {ex.HumanStackTrace()}";
-  }
-
-  // Internal methods
   private static void WalkException(StringBuilder sb, Exception ex, int level)
   {
     sb.Append(level == 1 ? "" : "    ")

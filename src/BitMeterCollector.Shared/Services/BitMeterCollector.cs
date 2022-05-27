@@ -104,7 +104,10 @@ public class BitMeterCollector : IBitMeterCollector
     catch (Exception ex)
     {
       mustBackOff = true;
-      _logger.LogError(ex, ex.AsGenericError());
+      _logger.LogError(ex, "{type}: {message}. | {stack}",
+        ex.GetType().Name,
+        ex.Message,
+        ex.HumanStackTrace());
     }
     finally
     {
