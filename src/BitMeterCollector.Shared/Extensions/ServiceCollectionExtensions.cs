@@ -1,4 +1,3 @@
-using BitMeterCollector.Shared.Factories;
 using BitMeterCollector.Shared.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,7 +19,6 @@ public static class ServiceCollectionExtensions
     return services
       .AddSingleton<IHttpService, HttpService>()
       .AddSingleton<IResponseService, ResponseService>()
-      .AddSingleton<IMetricFactory, MetricFactory>()
       .AddSingleton<IBitMeterCollector, Services.BitMeterCollector>()
 
       .AddSingleton<IDateTimeAbstraction, DateTimeAbstraction>()

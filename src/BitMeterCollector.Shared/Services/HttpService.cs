@@ -1,5 +1,4 @@
 using BitMeterCollector.Shared.Configuration;
-using Microsoft.Extensions.Logging;
 
 namespace BitMeterCollector.Shared.Services;
 
@@ -10,20 +9,13 @@ public interface IHttpService
 
 public class HttpService : IHttpService
 {
-  private readonly ILogger<HttpService> _logger;
-  private readonly BitMeterConfig _config;
   private readonly HttpClient _httpClient;
 
-  public HttpService(
-    ILogger<HttpService> logger,
-    BitMeterConfig config)
+  public HttpService(BitMeterConfig config)
   {
-    _logger = logger;
-    _config = config;
-
     _httpClient = new HttpClient
     {
-      Timeout = TimeSpan.FromMilliseconds(_config.HttpServiceTimeoutMs)
+      Timeout = TimeSpan.FromMilliseconds(config.HttpServiceTimeoutMs)
     };
   }
 

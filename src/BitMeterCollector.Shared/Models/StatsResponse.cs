@@ -11,5 +11,5 @@ public class StatsResponse
   public long TotalToday { get; set; }
   public long TotalWeek { get; set; }
   public long TotalMonth { get; set; }
-  public string Hostname { get; set; }
+  public string HostName { get; set; } = string.Empty;
 }

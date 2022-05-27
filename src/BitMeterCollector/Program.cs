@@ -6,7 +6,7 @@ namespace BitMeterCollector;
 
 public class Program
 {
-  public static void Main(string[] args)
+  protected static void Main(string[] args)
   {
     CreateHostBuilder(args).Build().Run();
   }
@@ -18,15 +18,15 @@ public class Program
       .UseWindowsService()
       .ConfigureServices((hostContext, services) =>
       {
-        var bitmeterConfig = hostContext.Configuration.BindBitMeterConfig();
+        var bmConfig = hostContext.Configuration.BindBitMeterConfig();
 
         // Ensure all servers have the "max missed polls" value set
-        foreach (var server in bitmeterConfig.Servers)
-          server.SetMaxMissedPolls(bitmeterConfig.MaxMissedPolls);
+        foreach (var server in bmConfig.Servers)
+          server.SetMaxMissedPolls(bmConfig.MaxMissedPolls);
 
         // Register services
         services
-          .AddSingleton(bitmeterConfig)
+          .AddSingleton(bmConfig)
           .AddBitMeterCollector(hostContext.Configuration)
           .AddHostedService<Worker>();
       });
