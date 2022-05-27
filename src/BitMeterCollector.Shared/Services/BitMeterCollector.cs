@@ -63,7 +63,7 @@ public class BitMeterCollector : IBitMeterCollector
     var currentTime = _dateTime.Now;
 
     return _config.Servers
-      .Where(s => s.CanCollectStats(currentTime))
+      .Where(s => s.Enabled && s.CanCollectStats(currentTime))
       .ToList();
   }
 

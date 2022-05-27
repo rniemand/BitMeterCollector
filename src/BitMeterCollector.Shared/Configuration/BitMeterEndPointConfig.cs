@@ -11,7 +11,7 @@ public class BitMeterEndPointConfig
   public int MaxMissedPolls { get; set; } = 5;
   public DateTime? BackOffEndTime { get; private set; }
 
-  public string BuildUrl(string append = null)
+  public string BuildUrl(string? append = null)
   {
     var baseUrl = "http";
     baseUrl += UseHttps ? "s" : "";
@@ -49,12 +49,8 @@ public class BitMeterEndPointConfig
 
   public bool CanCollectStats(DateTime now)
   {
-    // Not enabled
-    if (Enabled == false)
-      return false;
-      
     // Not in a cool-off period
-    if (BackOffEndTime.HasValue == false)
+    if (!BackOffEndTime.HasValue)
       return true;
 
     // Waiting for cool-off period to end
