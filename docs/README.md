@@ -1,11 +1,6 @@
-[Home](/README.md) / Docs
-
-# Documentation
-Starter documentation for `BitMeterCollector`.
-
-More to come...
+Nothing to see here, rather use [this page](/README.md).
 
 <!--(Rn.BuildScriptHelper){
 	"version": "1.0.107",
-	"replace": true
+	"replace": false
 }(END)-->

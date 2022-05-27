@@ -2,7 +2,6 @@ namespace BitMeterCollector.Shared.Configuration;
 
 public class BitMeterConfig
 {
-  public RabbitMQConfig RabbitMQ { get; set; } = new();
   public BitMeterEndPointConfig[] Servers { get; set; } = Array.Empty<BitMeterEndPointConfig>();
   public int CollectionIntervalSec { get; set; } = 10;
   public int HttpServiceTimeoutMs { get; set; } = 750;
