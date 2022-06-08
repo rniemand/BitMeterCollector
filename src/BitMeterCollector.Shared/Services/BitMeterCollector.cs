@@ -4,7 +4,6 @@ using BitMeterCollector.Shared.Models;
 using Microsoft.Extensions.Logging;
 using Rn.NetCore.Common.Abstractions;
 using Rn.NetCore.Metrics;
-using Rn.NetCore.Metrics.Models;
 
 namespace BitMeterCollector.Shared.Services;
 
@@ -48,7 +47,7 @@ public class BitMeterCollector : IBitMeterCollector
         continue;
 
       // Generate and send the metric
-      await _metricService.SubmitMetricAsync(CreateMetric(response));
+      await _metricService.SubmitAsync(CreateMetric(response));
     }
 
     await Task.Delay(_config.CollectionIntervalSec * 1000, stoppingToken);

@@ -5,10 +5,8 @@ using Microsoft.Extensions.Logging;
 using NLog.Extensions.Logging;
 using Rn.NetCore.Common.Abstractions;
 using Rn.NetCore.Common.Logging;
-using Rn.NetCore.Metrics;
-using Rn.NetCore.Metrics.Outputs;
-using Rn.NetCore.Metrics.Rabbit;
-using Rn.NetCore.Metrics.Rabbit.Interfaces;
+using Rn.NetCore.Metrics.Extensions;
+using Rn.NetCore.Metrics.Rabbit.Extensions;
 
 namespace BitMeterCollector.Shared.Extensions;
 
@@ -24,11 +22,8 @@ public static class ServiceCollectionExtensions
       .AddSingleton<IDateTimeAbstraction, DateTimeAbstraction>()
       .AddSingleton(typeof(ILoggerAdapter<>), typeof(LoggerAdapter<>))
 
-      .AddSingleton<IMetricServiceUtils, MetricServiceUtils>()
-      .AddSingleton<IMetricService, MetricService>()
-      .AddSingleton<IRabbitFactory, RabbitFactory>()
-      .AddSingleton<IRabbitConnection, RabbitConnection>()
-      .AddSingleton<IMetricOutput, RabbitMetricOutput>()
+      .AddRnMetricsBase(configuration)
+      .AddRnMetricRabbitMQ()
 
       .AddLogging(loggingBuilder =>
       {
