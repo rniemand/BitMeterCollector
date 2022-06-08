@@ -64,18 +64,18 @@ public class BitMeterCollector : IBitMeterCollector
 
   private void HandleServerBackOff(BitMeterEndPointConfig endpoint)
   {
-    if (!endpoint.UnsuccessfulPoll())
+    endpoint.MissedPolls += 1;
+    if (endpoint.MissedPolls < endpoint.MaxMissedPolls)
       return;
 
     var backOffEndTime = _dateTime.Now.AddSeconds(_config.BackOffPeriodSeconds);
-    endpoint.SetBackOffEndTime(backOffEndTime);
+    endpoint.BackOffEndTime = backOffEndTime;
 
     _logger.LogInformation(
       "Unable to reach {server} - backing off for {time} seconds (will try again at {date})",
       endpoint.ServerName,
       _config.BackOffPeriodSeconds,
-      backOffEndTime
-    );
+      backOffEndTime);
   }
 
   private async Task<StatsResponse?> GetStatsResponse(BitMeterEndPointConfig endpoint)
@@ -88,7 +88,8 @@ public class BitMeterCollector : IBitMeterCollector
       var body = await _httpService.GetUrl(url);
       if (_responseService.TryParseStatsResponse(endpoint, body, out var parsed))
       {
-        endpoint.SuccessfulPoll();
+        endpoint.MissedPolls = 0;
+        endpoint.BackOffEndTime = null;
         return parsed;
       }
     }
