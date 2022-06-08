@@ -18,5 +18,11 @@ public class BitMeterConfigBuilder
     return this;
   }
 
+  public BitMeterConfigBuilder WithHttpServiceTimeoutMs(int timeoutMs)
+  {
+    _config.HttpServiceTimeoutMs = timeoutMs;
+    return this;
+  }
+
   public BitMeterConfig Build() => _config;
 }

@@ -1,8 +1,8 @@
 using BitMeterCollector.Shared.Configuration;
 using BitMeterCollector.Shared.Extensions;
 using BitMeterCollector.Shared.Models;
-using Microsoft.Extensions.Logging;
 using Rn.NetCore.Common.Abstractions;
+using Rn.NetCore.Common.Logging;
 using Rn.NetCore.Metrics;
 
 namespace BitMeterCollector.Shared.Services;
@@ -14,7 +14,7 @@ public interface IBitMeterCollector
 
 public class BitMeterCollector : IBitMeterCollector
 {
-  private readonly ILogger<BitMeterCollector> _logger;
+  private readonly ILoggerAdapter<BitMeterCollector> _logger;
   private readonly BitMeterConfig _config;
   private readonly IHttpService _httpService;
   private readonly IResponseService _responseService;
@@ -22,7 +22,7 @@ public class BitMeterCollector : IBitMeterCollector
   private readonly IDateTimeAbstraction _dateTime;
 
   public BitMeterCollector(
-    ILogger<BitMeterCollector> logger,
+    ILoggerAdapter<BitMeterCollector> logger,
     BitMeterConfig config,
     IHttpService httpService,
     IResponseService responseService,
@@ -96,22 +96,23 @@ public class BitMeterCollector : IBitMeterCollector
     catch (TaskCanceledException)
     {
       mustBackOff = true;
+
       _logger.LogWarning("Timed out after {time} ms getting stats from {server}",
         _config.HttpServiceTimeoutMs,
-        endpoint.ServerName
-      );
+        endpoint.ServerName);
     }
     catch (Exception ex)
     {
       mustBackOff = true;
-      _logger.LogError(ex, "{type}: {message}. | {stack}",
+      _logger.LogError(ex, "{type}: {message} | {stack}",
         ex.GetType().Name,
         ex.Message,
         ex.HumanStackTrace());
     }
     finally
     {
-      if (mustBackOff) HandleServerBackOff(endpoint);
+      if (mustBackOff)
+        HandleServerBackOff(endpoint);
     }
 
     return null;
