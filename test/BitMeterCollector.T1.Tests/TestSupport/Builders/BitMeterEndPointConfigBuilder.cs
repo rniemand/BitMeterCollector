@@ -49,5 +49,11 @@ public class BitMeterEndPointConfigBuilder
     return this;
   }
 
+  public BitMeterEndPointConfigBuilder WithMissedPolls(int missedPolls)
+  {
+    _endPoint.MissedPolls = missedPolls;
+    return this;
+  }
+
   public BitMeterEndPointConfig Build() => _endPoint;
 }

@@ -18,6 +18,13 @@ public class BitMeterConfigBuilder
     return this;
   }
 
+  public BitMeterConfigBuilder WithEndPoint(BitMeterEndPointConfig endPoint)
+  {
+    _endPoints.Add(endPoint);
+    _config.Servers = _endPoints.ToArray();
+    return this;
+  }
+
   public BitMeterConfigBuilder WithHttpServiceTimeoutMs(int timeoutMs)
   {
     _config.HttpServiceTimeoutMs = timeoutMs;

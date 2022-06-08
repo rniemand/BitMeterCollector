@@ -80,22 +80,25 @@ public class BitMeterCollector : IBitMeterCollector
 
   private async Task<StatsResponse?> GetStatsResponse(BitMeterEndPointConfig endpoint)
   {
-    var url = endpoint.BuildUrl("getStats");
-    var mustBackOff = false;
-
     try
     {
+      var url = endpoint.BuildUrl("getStats");
       var body = await _httpService.GetUrl(url);
-      if (_responseService.TryParseStatsResponse(endpoint, body, out var parsed))
+      var parsedResponse = _responseService.ParseStatsResponse(endpoint, body);
+
+      if (parsedResponse is null)
       {
-        endpoint.MissedPolls = 0;
-        endpoint.BackOffEndTime = null;
-        return parsed;
+        endpoint.ResponseParsingErrors += 1;
+        return null;
       }
+
+      endpoint.MissedPolls = 0;
+      endpoint.BackOffEndTime = null;
+      return parsedResponse;
     }
     catch (TaskCanceledException)
     {
-      mustBackOff = true;
+      HandleServerBackOff(endpoint);
 
       _logger.LogWarning("Timed out after {time} ms getting stats from {server}",
         _config.HttpServiceTimeoutMs,
@@ -103,16 +106,12 @@ public class BitMeterCollector : IBitMeterCollector
     }
     catch (Exception ex)
     {
-      mustBackOff = true;
+      HandleServerBackOff(endpoint);
+
       _logger.LogError(ex, "{type}: {message} | {stack}",
         ex.GetType().Name,
         ex.Message,
         ex.HumanStackTrace());
-    }
-    finally
-    {
-      if (mustBackOff)
-        HandleServerBackOff(endpoint);
     }
 
     return null;

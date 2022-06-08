@@ -24,5 +24,7 @@ public class BitMeterEndPointConfig
 
   public int MaxMissedPolls { get; set; } = 5;
 
+  public int ResponseParsingErrors { get; set; }
+
   public DateTime? BackOffEndTime { get; set; }
 }
