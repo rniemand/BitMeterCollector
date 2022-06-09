@@ -11,6 +11,7 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
     <PackageReference Include="NLog.Extensions.Logging" Version="5.0.0" />
+    <PackageReference Include="Rn.NetCore.BasicHttp" Version="6.0.1.100" />
     <PackageReference Include="Rn.NetCore.Metrics" Version="6.1.0.101" />
     <PackageReference Include="Rn.NetCore.Metrics.Rabbit" Version="6.0.2.100" />
   </ItemGroup>

@@ -45,5 +45,11 @@ public class BitMeterConfigBuilder
     return this;
   }
 
+  public BitMeterConfigBuilder WithMaxMissedPolls(int count)
+  {
+    _config.MaxMissedPolls = count;
+    return this;
+  }
+
   public BitMeterConfig Build() => _config;
 }
