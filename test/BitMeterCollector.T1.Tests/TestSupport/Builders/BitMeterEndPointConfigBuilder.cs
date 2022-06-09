@@ -5,6 +5,10 @@ namespace BitMeterCollector.T1.Tests.TestSupport.Builders;
 
 public class BitMeterEndPointConfigBuilder
 {
+  public static BitMeterEndPointConfig Default = new BitMeterEndPointConfigBuilder()
+    .WithName("MyServer")
+    .Build();
+
   private readonly BitMeterEndPointConfig _endPoint = new();
 
   public BitMeterEndPointConfigBuilder WithName(string name)

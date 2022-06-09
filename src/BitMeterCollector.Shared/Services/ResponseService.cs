@@ -21,10 +21,9 @@ public class ResponseService : IResponseService
 
   public StatsResponse? ParseStatsResponse(BitMeterEndPointConfig config, string rawResponse)
   {
-    // Ensure this is not an empty string
     if (string.IsNullOrWhiteSpace(rawResponse))
     {
-      _logger.LogError("Empty response provided");
+      _logger.LogError("Empty response from {server}", config.ServerName);
       return null;
     }
 
@@ -37,22 +36,34 @@ public class ResponseService : IResponseService
     }
 
     // Create and map the response object
-    var parsed = new StatsResponse
+    try
     {
-      DownloadToday = long.Parse(entries[0]),
-      UploadToday = long.Parse(entries[1]),
-      DownloadWeek = long.Parse(entries[2]),
-      UploadWeek = long.Parse(entries[3]),
-      DownloadMonth = long.Parse(entries[4]),
-      UploadMonth = long.Parse(entries[5]),
-      HostName = config.ServerName.LowerTrim()
-    };
+      var parsed = new StatsResponse
+      {
+        DownloadToday = long.Parse(entries[0]),
+        UploadToday = long.Parse(entries[1]),
+        DownloadWeek = long.Parse(entries[2]),
+        UploadWeek = long.Parse(entries[3]),
+        DownloadMonth = long.Parse(entries[4]),
+        UploadMonth = long.Parse(entries[5]),
+        HostName = config.ServerName.LowerTrim()
+      };
 
-    // Calculate the totals
-    parsed.TotalToday = parsed.DownloadToday + parsed.UploadToday;
-    parsed.TotalWeek = parsed.DownloadWeek + parsed.UploadWeek;
-    parsed.TotalMonth = parsed.DownloadMonth + parsed.UploadMonth;
+      // Calculate the totals
+      parsed.TotalToday = parsed.DownloadToday + parsed.UploadToday;
+      parsed.TotalWeek = parsed.DownloadWeek + parsed.UploadWeek;
+      parsed.TotalMonth = parsed.DownloadMonth + parsed.UploadMonth;
 
-    return parsed;
+      return parsed;
+    }
+    catch (Exception ex)
+    {
+      _logger.LogError(ex, "{type}: {message} | {stack}",
+        ex.GetType().Name,
+        ex.Message,
+        ex.HumanStackTrace());
+
+      return null;
+    }
   }
 }
