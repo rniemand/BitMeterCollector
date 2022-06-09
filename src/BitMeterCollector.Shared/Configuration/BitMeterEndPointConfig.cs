@@ -21,58 +21,10 @@ public class BitMeterEndPointConfig
   public bool Enabled { get; set; } = true;
 
   public int MissedPolls { get; set; }
+
   public int MaxMissedPolls { get; set; } = 5;
-  public DateTime? BackOffEndTime { get; private set; }
 
-  public string BuildUrl(string? append = null)
-  {
-    var baseUrl = "http";
-    baseUrl += UseHttps ? "s" : "";
-    baseUrl += $"://{IPAddress}:{Port}";
+  public int ResponseParsingErrors { get; set; }
 
-    if (!string.IsNullOrEmpty(append))
-    {
-      baseUrl += $"/{append}";
-    }
-
-    return baseUrl;
-  }
-
-  public bool UnsuccessfulPoll()
-  {
-    MissedPolls += 1;
-    return MissedPolls >= MaxMissedPolls;
-  }
-
-  public void SuccessfulPoll()
-  {
-    MissedPolls = 0;
-    BackOffEndTime = null;
-  }
-
-  public void SetMaxMissedPolls(int amount)
-  {
-    MaxMissedPolls = amount;
-  }
-
-  public void SetBackOffEndTime(DateTime endTime)
-  {
-    BackOffEndTime = endTime;
-  }
-
-  public bool CanCollectStats(DateTime now)
-  {
-    // Not in a cool-off period
-    if (!BackOffEndTime.HasValue)
-      return true;
-
-    // Waiting for cool-off period to end
-    if (BackOffEndTime.Value > now)
-      return false;
-
-    // Cool-off period has ended
-    BackOffEndTime = null;
-    MissedPolls = 0;
-    return true;
-  }
+  public DateTime? BackOffEndTime { get; set; }
 }

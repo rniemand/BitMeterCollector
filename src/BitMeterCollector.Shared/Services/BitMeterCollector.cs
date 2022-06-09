@@ -1,10 +1,9 @@
 using BitMeterCollector.Shared.Configuration;
 using BitMeterCollector.Shared.Extensions;
 using BitMeterCollector.Shared.Models;
-using Microsoft.Extensions.Logging;
 using Rn.NetCore.Common.Abstractions;
+using Rn.NetCore.Common.Logging;
 using Rn.NetCore.Metrics;
-using Rn.NetCore.Metrics.Models;
 
 namespace BitMeterCollector.Shared.Services;
 
@@ -15,7 +14,7 @@ public interface IBitMeterCollector
 
 public class BitMeterCollector : IBitMeterCollector
 {
-  private readonly ILogger<BitMeterCollector> _logger;
+  private readonly ILoggerAdapter<BitMeterCollector> _logger;
   private readonly BitMeterConfig _config;
   private readonly IHttpService _httpService;
   private readonly IResponseService _responseService;
@@ -23,7 +22,7 @@ public class BitMeterCollector : IBitMeterCollector
   private readonly IDateTimeAbstraction _dateTime;
 
   public BitMeterCollector(
-    ILogger<BitMeterCollector> logger,
+    ILoggerAdapter<BitMeterCollector> logger,
     BitMeterConfig config,
     IHttpService httpService,
     IResponseService responseService,
@@ -48,7 +47,8 @@ public class BitMeterCollector : IBitMeterCollector
         continue;
 
       // Generate and send the metric
-      await _metricService.SubmitMetricAsync(CreateMetric(response));
+      var serverMetric = CreateMetric(response);
+      await _metricService.SubmitAsync(serverMetric);
     }
 
     await Task.Delay(_config.CollectionIntervalSec * 1000, stoppingToken);
@@ -63,55 +63,56 @@ public class BitMeterCollector : IBitMeterCollector
       .ToList();
   }
 
-  private void HandleServerBackOff(BitMeterEndPointConfig endpoint)
+  private void HandleBackOff(BitMeterEndPointConfig endpoint)
   {
-    if (!endpoint.UnsuccessfulPoll())
+    endpoint.MissedPolls += 1;
+    if (endpoint.MissedPolls < endpoint.MaxMissedPolls)
       return;
 
     var backOffEndTime = _dateTime.Now.AddSeconds(_config.BackOffPeriodSeconds);
-    endpoint.SetBackOffEndTime(backOffEndTime);
+    endpoint.BackOffEndTime = backOffEndTime;
 
     _logger.LogInformation(
       "Unable to reach {server} - backing off for {time} seconds (will try again at {date})",
       endpoint.ServerName,
       _config.BackOffPeriodSeconds,
-      backOffEndTime
-    );
+      backOffEndTime);
   }
 
   private async Task<StatsResponse?> GetStatsResponse(BitMeterEndPointConfig endpoint)
   {
-    var url = endpoint.BuildUrl("getStats");
-    var mustBackOff = false;
-
     try
     {
+      var url = endpoint.BuildUrl("getStats");
       var body = await _httpService.GetUrl(url);
-      if (_responseService.TryParseStatsResponse(endpoint, body, out var parsed))
+      var parsedResponse = _responseService.ParseStatsResponse(endpoint, body);
+
+      if (parsedResponse is null)
       {
-        endpoint.SuccessfulPoll();
-        return parsed;
+        endpoint.ResponseParsingErrors += 1;
+        return null;
       }
+
+      endpoint.MissedPolls = 0;
+      endpoint.BackOffEndTime = null;
+      return parsedResponse;
     }
     catch (TaskCanceledException)
     {
-      mustBackOff = true;
+      HandleBackOff(endpoint);
+
       _logger.LogWarning("Timed out after {time} ms getting stats from {server}",
         _config.HttpServiceTimeoutMs,
-        endpoint.ServerName
-      );
+        endpoint.ServerName);
     }
     catch (Exception ex)
     {
-      mustBackOff = true;
-      _logger.LogError(ex, "{type}: {message}. | {stack}",
+      HandleBackOff(endpoint);
+
+      _logger.LogError(ex, "{type}: {message} | {stack}",
         ex.GetType().Name,
         ex.Message,
         ex.HumanStackTrace());
-    }
-    finally
-    {
-      if (mustBackOff) HandleServerBackOff(endpoint);
     }
 
     return null;

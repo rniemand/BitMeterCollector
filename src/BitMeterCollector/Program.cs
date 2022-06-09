@@ -22,7 +22,7 @@ public class Program
 
         // Ensure all servers have the "max missed polls" value set
         foreach (var server in bmConfig.Servers)
-          server.SetMaxMissedPolls(bmConfig.MaxMissedPolls);
+          server.MaxMissedPolls = bmConfig.MaxMissedPolls;
 
         // Register services
         services

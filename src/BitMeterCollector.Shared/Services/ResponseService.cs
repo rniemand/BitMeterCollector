@@ -1,33 +1,31 @@
 using BitMeterCollector.Shared.Configuration;
 using BitMeterCollector.Shared.Extensions;
 using BitMeterCollector.Shared.Models;
-using Microsoft.Extensions.Logging;
+using Rn.NetCore.Common.Logging;
 
 namespace BitMeterCollector.Shared.Services;
 
 public interface IResponseService
 {
-  bool TryParseStatsResponse(BitMeterEndPointConfig config, string rawResponse, out StatsResponse parsed);
+  StatsResponse? ParseStatsResponse(BitMeterEndPointConfig config, string rawResponse);
 }
 
 public class ResponseService : IResponseService
 {
-  private readonly ILogger<ResponseService> _logger;
+  private readonly ILoggerAdapter<ResponseService> _logger;
 
-  public ResponseService(ILogger<ResponseService> logger)
+  public ResponseService(ILoggerAdapter<ResponseService> logger)
   {
     _logger = logger;
   }
 
-  public bool TryParseStatsResponse(BitMeterEndPointConfig config, string rawResponse, out StatsResponse parsed)
+  public StatsResponse? ParseStatsResponse(BitMeterEndPointConfig config, string rawResponse)
   {
-    parsed = new StatsResponse();
-
     // Ensure this is not an empty string
     if (string.IsNullOrWhiteSpace(rawResponse))
     {
       _logger.LogError("Empty response provided");
-      return false;
+      return null;
     }
 
     // Ensure that we have our expected 6 entries
@@ -35,11 +33,11 @@ public class ResponseService : IResponseService
     if (entries.Length < 6)
     {
       _logger.LogError("Expecting 6 entries, got {count}", entries.Length);
-      return false;
+      return null;
     }
 
     // Create and map the response object
-    parsed = new StatsResponse
+    var parsed = new StatsResponse
     {
       DownloadToday = long.Parse(entries[0]),
       UploadToday = long.Parse(entries[1]),
@@ -55,6 +53,6 @@ public class ResponseService : IResponseService
     parsed.TotalWeek = parsed.DownloadWeek + parsed.UploadWeek;
     parsed.TotalMonth = parsed.DownloadMonth + parsed.UploadMonth;
 
-    return true;
+    return parsed;
   }
 }
