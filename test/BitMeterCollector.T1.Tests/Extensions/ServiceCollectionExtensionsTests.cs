@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using NUnit.Framework;
+using Rn.NetCore.BasicHttp.Factories;
 using Rn.NetCore.Common.Abstractions;
 using Rn.NetCore.Common.Logging;
 using Rn.NetCore.Metrics;
@@ -115,6 +116,23 @@ public class ServiceCollectionExtensionsTests
     var service = provider.GetService<IMetricService>();
     Assert.That(service, Is.Not.Null);
     Assert.That(service, Is.InstanceOf<MetricService>());
+  }
+
+  [Test]
+  public void AddBitMeterCollector_GivenCalled_ShouldRegisterHttpClientFactory()
+  {
+    // arrange
+    var configuration = Substitute.For<IConfiguration>();
+    var serviceCollection = GetServiceCollection(configuration);
+
+    // act
+    serviceCollection.AddBitMeterCollector(configuration);
+    var provider = serviceCollection.BuildServiceProvider();
+
+    // assert
+    var service = provider.GetService<IHttpClientFactory>();
+    Assert.That(service, Is.Not.Null);
+    Assert.That(service, Is.InstanceOf<HttpClientFactory>());
   }
 
   [Test]
