@@ -47,7 +47,8 @@ public class BitMeterCollector : IBitMeterCollector
         continue;
 
       // Generate and send the metric
-      await _metricService.SubmitAsync(CreateMetric(response));
+      var serverMetric = CreateMetric(response);
+      await _metricService.SubmitAsync(serverMetric);
     }
 
     await Task.Delay(_config.CollectionIntervalSec * 1000, stoppingToken);
@@ -62,7 +63,7 @@ public class BitMeterCollector : IBitMeterCollector
       .ToList();
   }
 
-  private void HandleServerBackOff(BitMeterEndPointConfig endpoint)
+  private void HandleBackOff(BitMeterEndPointConfig endpoint)
   {
     endpoint.MissedPolls += 1;
     if (endpoint.MissedPolls < endpoint.MaxMissedPolls)
@@ -98,7 +99,7 @@ public class BitMeterCollector : IBitMeterCollector
     }
     catch (TaskCanceledException)
     {
-      HandleServerBackOff(endpoint);
+      HandleBackOff(endpoint);
 
       _logger.LogWarning("Timed out after {time} ms getting stats from {server}",
         _config.HttpServiceTimeoutMs,
@@ -106,7 +107,7 @@ public class BitMeterCollector : IBitMeterCollector
     }
     catch (Exception ex)
     {
-      HandleServerBackOff(endpoint);
+      HandleBackOff(endpoint);
 
       _logger.LogError(ex, "{type}: {message} | {stack}",
         ex.GetType().Name,

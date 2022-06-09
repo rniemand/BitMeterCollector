@@ -55,5 +55,11 @@ public class BitMeterEndPointConfigBuilder
     return this;
   }
 
+  public BitMeterEndPointConfigBuilder WithMaxMissedPolls(int maxMissedPolls)
+  {
+    _endPoint.MaxMissedPolls = maxMissedPolls;
+    return this;
+  }
+  
   public BitMeterEndPointConfig Build() => _endPoint;
 }

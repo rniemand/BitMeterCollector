@@ -36,6 +36,7 @@ public class GetServersTests
     // arrange
     var httpService = Substitute.For<IHttpService>();
     var config = new BitMeterConfigBuilder()
+      .WithCollectionIntervalSec(0)
       .WithEndPoint(builder => builder.WithEnabled(false))
       .Build();
 
@@ -59,6 +60,7 @@ public class GetServersTests
     var baseDate = DateTime.Now;
 
     var config = new BitMeterConfigBuilder()
+      .WithCollectionIntervalSec(0)
       .WithEndPoint(builder => builder
         .WithEnabled(true)
         .WithBackOffEndTime(baseDate.AddMinutes(1)))

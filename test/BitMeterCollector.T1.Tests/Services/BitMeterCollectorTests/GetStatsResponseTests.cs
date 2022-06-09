@@ -28,6 +28,7 @@ public class GetStatsResponseTests
     var httpService = Substitute.For<IHttpService>();
 
     var config = new BitMeterConfigBuilder()
+      .WithCollectionIntervalSec(0)
       .WithEndPoint(builder => builder
         .WithEnabled(true)
         .WithIPAddress(IPAddress, Port, false))
@@ -53,6 +54,7 @@ public class GetStatsResponseTests
     var ex = new Exception("Whoops");
 
     var config = new BitMeterConfigBuilder()
+      .WithCollectionIntervalSec(0)
       .WithEndPoint(builder => builder
         .WithEnabled(true)
         .WithIPAddress(IPAddress, Port, false))
@@ -86,6 +88,7 @@ public class GetStatsResponseTests
     var ex = new TaskCanceledException("Whoops");
 
     var config = new BitMeterConfigBuilder()
+      .WithCollectionIntervalSec(0)
       .WithHttpServiceTimeoutMs(DefaultTimeoutMs)
       .WithEndPoint(builder => builder
         .WithEnabled(true)
@@ -125,6 +128,7 @@ public class GetStatsResponseTests
       .Build();
 
     var config = new BitMeterConfigBuilder()
+      .WithCollectionIntervalSec(0)
       .WithHttpServiceTimeoutMs(DefaultTimeoutMs)
       .WithEndPoint(endPointConfig)
       .Build();
@@ -143,11 +147,11 @@ public class GetStatsResponseTests
       responseService: responseService);
 
     // act
-    Assert.That(config.Servers[0].ResponseParsingErrors, Is.EqualTo(0));
+    Assert.That(endPointConfig.ResponseParsingErrors, Is.EqualTo(0));
     await collector.TickAsync(CancellationToken.None);
 
     // assert
-    Assert.That(config.Servers[0].ResponseParsingErrors, Is.EqualTo(1));
+    Assert.That(endPointConfig.ResponseParsingErrors, Is.EqualTo(1));
   }
 
   [Test]
@@ -165,6 +169,7 @@ public class GetStatsResponseTests
       .Build();
 
     var config = new BitMeterConfigBuilder()
+      .WithCollectionIntervalSec(0)
       .WithHttpServiceTimeoutMs(DefaultTimeoutMs)
       .WithEndPoint(endPointConfig)
       .Build();
@@ -183,10 +188,10 @@ public class GetStatsResponseTests
       responseService: responseService);
 
     // act
-    Assert.That(config.Servers[0].MissedPolls, Is.EqualTo(1));
+    Assert.That(endPointConfig.MissedPolls, Is.EqualTo(1));
     await collector.TickAsync(CancellationToken.None);
 
     // assert
-    Assert.That(config.Servers[0].MissedPolls, Is.EqualTo(0));
+    Assert.That(endPointConfig.MissedPolls, Is.EqualTo(0));
   }
 }

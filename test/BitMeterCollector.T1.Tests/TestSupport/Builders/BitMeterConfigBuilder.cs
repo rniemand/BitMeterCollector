@@ -6,7 +6,9 @@ namespace BitMeterCollector.T1.Tests.TestSupport.Builders;
 
 public class BitMeterConfigBuilder
 {
-  public static BitMeterConfig Default => new BitMeterConfigBuilder().Build();
+  public static BitMeterConfig Default => new BitMeterConfigBuilder()
+    .WithCollectionIntervalSec(0)
+    .Build();
 
   private readonly BitMeterConfig _config = new();
   private readonly List<BitMeterEndPointConfig> _endPoints = new();
@@ -28,6 +30,18 @@ public class BitMeterConfigBuilder
   public BitMeterConfigBuilder WithHttpServiceTimeoutMs(int timeoutMs)
   {
     _config.HttpServiceTimeoutMs = timeoutMs;
+    return this;
+  }
+
+  public BitMeterConfigBuilder WithBackOffPeriodSeconds(int seconds)
+  {
+    _config.BackOffPeriodSeconds = seconds;
+    return this;
+  }
+
+  public BitMeterConfigBuilder WithCollectionIntervalSec(int interval)
+  {
+    _config.CollectionIntervalSec = interval;
     return this;
   }
 
