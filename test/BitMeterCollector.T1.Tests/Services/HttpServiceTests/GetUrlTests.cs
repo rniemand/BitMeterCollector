@@ -2,8 +2,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
-using Rn.NetCore.BasicHttp.Factories;
-using Rn.NetCore.BasicHttp.Wrappers;
+using Rn.NetCore.BasicHttp;
 
 namespace BitMeterCollector.T1.Tests.Services.HttpServiceTests;
 

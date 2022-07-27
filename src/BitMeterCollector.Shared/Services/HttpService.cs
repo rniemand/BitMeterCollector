@@ -1,6 +1,5 @@
 using BitMeterCollector.Shared.Configuration;
-using Rn.NetCore.BasicHttp.Factories;
-using Rn.NetCore.BasicHttp.Wrappers;
+using Rn.NetCore.BasicHttp;
 
 namespace BitMeterCollector.Shared.Services;
 

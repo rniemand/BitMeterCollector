@@ -2,7 +2,7 @@ using BitMeterCollector.Shared.Configuration;
 using BitMeterCollector.Shared.Services;
 using BitMeterCollector.T1.Tests.TestSupport.Builders;
 using NSubstitute;
-using Rn.NetCore.BasicHttp.Factories;
+using Rn.NetCore.BasicHttp;
 
 namespace BitMeterCollector.T1.Tests.Services.HttpServiceTests;
 

@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using NLog.Extensions.Logging;
-using Rn.NetCore.BasicHttp.Factories;
+using Rn.NetCore.BasicHttp;
 using Rn.NetCore.Common.Abstractions;
 using Rn.NetCore.Common.Logging;
 using Rn.NetCore.Metrics.Extensions;
@@ -14,8 +14,7 @@ namespace BitMeterCollector.Shared.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-  public static IServiceCollection AddBitMeterCollector(this IServiceCollection services, IConfiguration configuration)
-  {
+  public static IServiceCollection AddBitMeterCollector(this IServiceCollection services, IConfiguration configuration) =>
     services
       .AddSingleton<IHttpService, HttpService>()
       .AddSingleton<IResponseService, ResponseService>()
@@ -26,6 +25,7 @@ public static class ServiceCollectionExtensions
 
       .AddRnMetricsBase(configuration)
       .AddRnMetricRabbitMQ()
+      .AddRnBasicHttp(configuration)
 
       .AddLogging(loggingBuilder =>
       {
@@ -33,9 +33,4 @@ public static class ServiceCollectionExtensions
         loggingBuilder.SetMinimumLevel(LogLevel.Trace);
         loggingBuilder.AddNLog(configuration);
       });
-
-    services.TryAddSingleton<IHttpClientFactory, HttpClientFactory>();
-
-    return services;
-  }
 }
