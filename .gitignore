@@ -229,8 +229,4 @@ _Pvt_Extensions
 # FAKE - F# Make
 .fake/
 
-src/OnCall\.ApplicationDB/OnCall\.ApplicationDB\.jfm
-
-#(Rn.BuildScriptHelper){
-#  "version": "1.0.107"
-#}(END)
+\.github/\.sonarqube/
