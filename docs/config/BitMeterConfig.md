@@ -1,5 +1,3 @@
-[Home](/README.md) / [Configuration](/docs/config/README.md) / BitMeterConfig
-
 # BitMeterConfig
 Configuration is defined in your applications `appsettings.json` file like so:
 

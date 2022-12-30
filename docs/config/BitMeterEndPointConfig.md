@@ -1,5 +1,3 @@
-[Home](/README.md) / [Configuration](/docs/config/README.md) / BitMeterEndPointConfig
-
 # BitMeterEndPointConfig
 More to come...
 
