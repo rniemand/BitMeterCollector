@@ -1,5 +1,4 @@
 using BitMeterCollector.Shared.Configuration;
-using Rn.NetCore.BasicHttp;
 
 namespace BitMeterCollector.Shared.Services;
 
@@ -10,11 +9,11 @@ public interface IHttpService
 
 public class HttpService : IHttpService
 {
-  private readonly IHttpClient _httpClient;
+  private readonly HttpClient _httpClient;
 
-  public HttpService(BitMeterConfig config, IHttpClientFactory httpClientFactory)
+  public HttpService(BitMeterConfig config)
   {
-    var httpClient = httpClientFactory.GetHttpClient();
+    var httpClient = new HttpClient();
     httpClient.Timeout = TimeSpan.FromMilliseconds(config.HttpServiceTimeoutMs);
     _httpClient = httpClient;
   }

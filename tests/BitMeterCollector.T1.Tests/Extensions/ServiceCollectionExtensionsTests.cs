@@ -5,11 +5,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using NUnit.Framework;
-using Rn.NetCore.BasicHttp;
-using Rn.NetCore.Common.Abstractions;
-using Rn.NetCore.Common.Logging;
-using Rn.NetCore.Metrics;
-using Rn.NetCore.Metrics.Rabbit;
+using RnCore.Abstractions;
+using RnCore.Logging;
+using RnCore.Metrics;
 
 namespace BitMeterCollector.T1.Tests.Extensions;
 
@@ -113,45 +111,11 @@ public class ServiceCollectionExtensionsTests
     var provider = serviceCollection.BuildServiceProvider();
 
     // assert
-    var service = provider.GetService<IMetricService>();
+    var service = provider.GetService<IMetricsService>();
     Assert.That(service, Is.Not.Null);
-    Assert.That(service, Is.InstanceOf<MetricService>());
+    Assert.That(service, Is.InstanceOf<MetricsService>());
   }
-
-  [Test]
-  public void AddBitMeterCollector_GivenCalled_ShouldRegisterHttpClientFactory()
-  {
-    // arrange
-    var configuration = Substitute.For<IConfiguration>();
-    var serviceCollection = GetServiceCollection(configuration);
-
-    // act
-    serviceCollection.AddBitMeterCollector(configuration);
-    var provider = serviceCollection.BuildServiceProvider();
-
-    // assert
-    var service = provider.GetService<IHttpClientFactory>();
-    Assert.That(service, Is.Not.Null);
-    Assert.That(service, Is.InstanceOf<HttpClientFactory>());
-  }
-
-  [Test]
-  public void AddBitMeterCollector_GivenCalled_ShouldRegisterRabbitMQ()
-  {
-    // arrange
-    var configuration = Substitute.For<IConfiguration>();
-    var serviceCollection = GetServiceCollection();
-
-    // act
-    serviceCollection.AddBitMeterCollector(configuration);
-    var provider = serviceCollection.BuildServiceProvider();
-
-    // assert
-    var service = provider.GetService<IRabbitConnection>();
-    Assert.That(service, Is.Not.Null);
-    Assert.That(service, Is.InstanceOf<RabbitConnection>());
-  }
-
+  
   private static IServiceCollection GetServiceCollection(IConfiguration? configuration = null)
   {
     var serviceCollection = new ServiceCollection()

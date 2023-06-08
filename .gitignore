@@ -230,3 +230,5 @@ _Pvt_Extensions
 .fake/
 
 \.github/\.sonarqube/
+
+*.ncrunchsolution

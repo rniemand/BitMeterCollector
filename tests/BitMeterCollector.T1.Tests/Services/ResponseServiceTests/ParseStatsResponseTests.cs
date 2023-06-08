@@ -4,7 +4,7 @@ using BitMeterCollector.Shared.Services;
 using BitMeterCollector.T1.Tests.TestSupport.Builders;
 using NSubstitute;
 using NUnit.Framework;
-using Rn.NetCore.Common.Logging;
+using RnCore.Logging;
 
 namespace BitMeterCollector.T1.Tests.Services.ResponseServiceTests;
 
@@ -91,9 +91,8 @@ public class ParseStatsResponseTests
     responseService.ParseStatsResponse(endPointConfig, BadResponse);
 
     // assert
-    logger.Received(1).LogError(Arg.Any<Exception>(), "{type}: {message} | {stack}",
+    logger.Received(1).LogError(Arg.Any<Exception>(), "{type}: {message}",
       "FormatException",
-      Arg.Any<string>(),
       Arg.Any<string>());
   }
 

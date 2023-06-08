@@ -8,7 +8,7 @@ using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using NSubstitute.ReturnsExtensions;
 using NUnit.Framework;
-using Rn.NetCore.Common.Logging;
+using RnCore.Logging;
 
 namespace BitMeterCollector.T1.Tests.Services.BitMeterCollectorTests;
 
@@ -73,10 +73,9 @@ public class GetStatsResponseTests
     await collector.TickAsync(CancellationToken.None);
 
     // assert
-    logger.Received(1).LogError(ex, "{type}: {message} | {stack}",
+    logger.Received(1).LogError(ex, "{type}: {message}",
       ex.GetType().Name,
-      ex.Message,
-      ex.HumanStackTrace());
+      ex.Message);
   }
 
   [Test]
