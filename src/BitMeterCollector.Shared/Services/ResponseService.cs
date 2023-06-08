@@ -1,7 +1,7 @@
 using BitMeterCollector.Shared.Configuration;
 using BitMeterCollector.Shared.Extensions;
 using BitMeterCollector.Shared.Models;
-using Rn.NetCore.Common.Logging;
+using RnCore.Logging;
 
 namespace BitMeterCollector.Shared.Services;
 
@@ -58,10 +58,9 @@ public class ResponseService : IResponseService
     }
     catch (Exception ex)
     {
-      _logger.LogError(ex, "{type}: {message} | {stack}",
+      _logger.LogError(ex, "{type}: {message}",
         ex.GetType().Name,
-        ex.Message,
-        ex.HumanStackTrace());
+        ex.Message);
 
       return null;
     }

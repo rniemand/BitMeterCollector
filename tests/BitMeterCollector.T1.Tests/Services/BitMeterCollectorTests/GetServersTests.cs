@@ -5,7 +5,7 @@ using BitMeterCollector.Shared.Services;
 using BitMeterCollector.T1.Tests.TestSupport.Builders;
 using NSubstitute;
 using NUnit.Framework;
-using Rn.NetCore.Common.Abstractions;
+using RnCore.Abstractions;
 
 namespace BitMeterCollector.T1.Tests.Services.BitMeterCollectorTests;
 

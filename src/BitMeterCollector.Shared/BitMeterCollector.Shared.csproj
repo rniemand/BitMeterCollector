@@ -11,9 +11,10 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
     <PackageReference Include="NLog.Extensions.Logging" Version="5.3.0" />
-    <PackageReference Include="Rn.NetCore.BasicHttp" Version="6.0.1.103" />
-    <PackageReference Include="Rn.NetCore.Metrics" Version="6.1.0.103" />
-    <PackageReference Include="Rn.NetCore.Metrics.Rabbit" Version="6.0.2.103" />
+    <PackageReference Include="RnCore.Abstractions" Version="6.0.0.110" />
+    <PackageReference Include="RnCore.Logging" Version="6.0.0.105" />
+    <PackageReference Include="RnCore.Metrics" Version="6.0.0.105" />
+    <PackageReference Include="RnCore.Metrics.InfluxDb" Version="6.0.0.105" />
   </ItemGroup>
 
 </Project>

@@ -6,8 +6,8 @@ using BitMeterCollector.T1.Tests.TestSupport.Builders;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
-using Rn.NetCore.Common.Abstractions;
-using Rn.NetCore.Common.Logging;
+using RnCore.Abstractions;
+using RnCore.Logging;
 
 namespace BitMeterCollector.T1.Tests.Services.BitMeterCollectorTests;
 
@@ -18,7 +18,6 @@ public class HandleBackOffTests
   private const int Port = 8912;
   private const int DefaultTimeoutMs = 500;
   private const string ServerName = "MyServer";
-  private const string BadServiceResponse = "BadServiceResponse";
   private const int BackOffPeriodSeconds = 10;
 
   [Test]

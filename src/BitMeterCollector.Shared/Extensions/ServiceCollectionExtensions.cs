@@ -1,14 +1,12 @@
 using BitMeterCollector.Shared.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using NLog.Extensions.Logging;
-using Rn.NetCore.BasicHttp;
-using Rn.NetCore.Common.Abstractions;
-using Rn.NetCore.Common.Logging;
-using Rn.NetCore.Metrics.Extensions;
-using Rn.NetCore.Metrics.Rabbit.Extensions;
+using RnCore.Abstractions;
+using RnCore.Logging;
+using RnCore.Metrics.Extensions;
+using RnCore.Metrics.InfluxDb;
 
 namespace BitMeterCollector.Shared.Extensions;
 
@@ -22,10 +20,8 @@ public static class ServiceCollectionExtensions
 
       .AddSingleton<IDateTimeAbstraction, DateTimeAbstraction>()
       .AddSingleton(typeof(ILoggerAdapter<>), typeof(LoggerAdapter<>))
-
-      .AddRnMetricsBase(configuration)
-      .AddRnMetricRabbitMQ()
-      .AddRnBasicHttp(configuration)
+      .AddRnCoreMetrics()
+      .AddInfluxDbMetricOutput()
 
       .AddLogging(loggingBuilder =>
       {

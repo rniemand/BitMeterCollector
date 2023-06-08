@@ -1,6 +1,6 @@
 using BitMeterCollector.Shared.Services;
 using NSubstitute;
-using Rn.NetCore.Common.Logging;
+using RnCore.Logging;
 
 namespace BitMeterCollector.T1.Tests.Services.ResponseServiceTests;
 
